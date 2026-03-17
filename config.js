@@ -1,0 +1,1 @@
+window.APP_CONFIG = { appName: 'Aplikasi LHK PWA' };

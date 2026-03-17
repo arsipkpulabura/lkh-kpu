@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aplikasi Laporan Kinerja Harian</title>
+  <meta name="theme-color" content="#0b1220" />
+  <meta name="description" content="Aplikasi Laporan Kinerja Harian versi PWA." />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/icons/icon-192.png" />
+<style>
+  :root{
+    --bg:#0b1220; --bg-soft:#111a2b; --card:#0f1a30; --card2:#101f3a; --card3:rgba(255,255,255,.03);
+    --text:#e8eefc; --text-soft:#cfdaf0; --muted:#9db0d1; --muted-2:#8ea0bf; --line:rgba(255,255,255,.08);
+    --line-strong:rgba(255,255,255,.14); --brand:#3b82f6; --brand2:#2563eb; --brand-soft:rgba(59,130,246,.18);
+    --danger:#dc4768; --danger-soft:rgba(220,71,104,.16); --success:#16a34a; --shadow:0 12px 34px rgba(0,0,0,.24);
+    --radius:18px; --radius-sm:14px; --radius-xs:12px;
+  }
+  *{ box-sizing:border-box; }
+  html, body{ margin:0; width:100%; min-height:100%; }
+  body{
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background:
+      radial-gradient(1200px 600px at 20% 0%, rgba(59,130,246,.20), transparent 60%),
+      radial-gradient(900px 500px at 100% 30%, rgba(37,99,235,.14), transparent 55%),
+      linear-gradient(180deg, #09111d 0%, #0b1220 100%);
+    color:var(--text); letter-spacing:.1px; line-height:1.55;
+  }
+  .container{ width:100%; max-width:1440px; margin:0 auto; padding:24px 28px 32px; }
+  .card{ background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025)); border:1px solid var(--line); border-radius:var(--radius); padding:20px; margin-bottom:18px; box-shadow:var(--shadow); backdrop-filter:blur(8px); }
+  h1,h2,h3,h4{ margin:0; color:var(--text); line-height:1.35; }
+  h3{ font-size:21px; font-weight:800; letter-spacing:.2px; }
+  h4{ font-size:15px; font-weight:800; color:var(--text-soft); }
+  .pageSub{ font-size:13px; color:var(--muted); margin-top:6px; line-height:1.7; }
+  .hint{ font-size:12px; color:var(--muted); margin-top:8px; line-height:1.7; }
+  label{ display:block; font-size:12px; color:#c6d4eb; margin-top:12px; margin-bottom:7px; font-weight:700; letter-spacing:.2px; }
+  input, select, textarea{
+    width:100%; padding:12px 14px; border:1px solid var(--line-strong); border-radius:13px;
+    background:rgba(6,13,25,.42); color:var(--text); outline:none; font-size:14px; line-height:1.45;
+    transition:border-color .18s ease, box-shadow .18s ease, background .18s ease;
+  }
+  input::placeholder, textarea::placeholder{ color:#8ea0bf; }
+  input:focus, select:focus, textarea:focus{ border-color:rgba(59,130,246,.58); box-shadow:0 0 0 4px rgba(59,130,246,.12); background:rgba(8,18,35,.60); }
+  input:disabled{ opacity:.88; cursor:not-allowed; }
+  textarea{ min-height:78px; resize:vertical; }
+  select{ background:rgba(6,13,25,.42)!important; color:var(--text)!important; border:1px solid var(--line-strong)!important; appearance:none; }
+  select option{ background:#0f1a30!important; color:var(--text)!important; }
+  .row{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+  .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-top:16px; background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:18px; padding:8px; }
+  .tab{ background:transparent; border:1px solid transparent; border-radius:999px; padding:11px 16px; cursor:pointer; user-select:none; color:var(--muted); font-size:13px; font-weight:800; transition:all .18s ease; }
+  .tab:hover{ color:var(--text); background:rgba(255,255,255,.04); }
+  .tab.active{ background:var(--brand-soft); color:var(--text); border-color:rgba(59,130,246,.35); box-shadow:inset 0 0 0 1px rgba(255,255,255,.03); }
+  button{ margin-top:12px; padding:11px 14px; border:1px solid rgba(59,130,246,.30); border-radius:12px; cursor:pointer; background:linear-gradient(180deg,#3b82f6,#2563eb); color:#fff; font-size:13px; font-weight:800; letter-spacing:.15px; transition:transform .15s ease, box-shadow .18s ease, opacity .18s ease, background .18s ease; box-shadow:0 8px 18px rgba(37,99,235,.24);}
+  button:hover{ transform:translateY(-1px); } button:active{ transform:translateY(0); }
+  button.secondary{ background:rgba(255,255,255,.08); color:var(--text); border-color:rgba(255,255,255,.12); box-shadow:none; }
+  button.secondary:hover{ background:rgba(255,255,255,.12); }
+  button.danger{ background:var(--danger-soft); border-color:rgba(220,71,104,.32); color:#ffdbe3; box-shadow:none; }
+  button.danger:hover{ background:rgba(220,71,104,.22); }
+  .hidden{ display:none!important; }
+  .previewBox{ background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; margin-top:12px; }
+  iframe{ width:100%; height:80vh; border:0; background:#fff; border-radius:12px; }
+  table{ width:100%; border-collapse:collapse; overflow:hidden; }
+  th, td{ border:1px solid rgba(255,255,255,.08); padding:11px 12px; font-size:12px; vertical-align:top; line-height:1.6; }
+  th{ color:var(--text); background:rgba(255,255,255,.05); text-align:left; font-weight:800; }
+  td{ color:var(--text-soft); background:rgba(255,255,255,.015); }
+  .toolbarCard{ position:sticky; top:10px; z-index:5; background:linear-gradient(180deg, rgba(15,26,48,.98), rgba(15,26,48,.92)); border:1px solid var(--line); border-radius:16px; padding:15px; margin-bottom:15px; backdrop-filter:blur(12px); box-shadow:var(--shadow); }
+  .toolbarRow{ display:flex; gap:12px; flex-wrap:wrap; align-items:end; }
+  .toolbarRow > div{ flex:1 1 220px; }
+  .toolbarRow .btnWrap{ flex:1 1 340px; display:flex; gap:10px; align-items:end; flex-wrap:wrap; }
+  .toolbarRow .btnWrap button{ margin-top:0; }
+  .sectionGroup{ display:flex; flex-direction:column; gap:14px; margin-top:14px; }
+  .sectionCard{ background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border:1px solid var(--line); border-radius:18px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,.16); }
+  .sectionHead{ width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 17px; margin:0; border:0; border-radius:0; background:transparent; color:var(--text); cursor:pointer; text-align:left; font-weight:800; box-shadow:none; }
+  .sectionHead:hover{ background:rgba(255,255,255,.03); }
+  .sectionHead .left{ display:flex; flex-direction:column; gap:5px; }
+  .sectionHead .title{ font-size:15px; font-weight:800; letter-spacing:.2px; }
+  .sectionHead .sub{ font-size:12px; color:var(--muted); font-weight:500; line-height:1.7; }
+  .sectionHead .chev{ font-size:18px; line-height:1; transition:transform .2s ease, color .2s ease; color:var(--muted); }
+  .sectionCard.open .sectionHead .chev{ transform:rotate(180deg); color:var(--text); }
+  .sectionBody{ display:none; padding:0 17px 18px 17px; border-top:1px solid rgba(255,255,255,.06); }
+  .sectionCard.open .sectionBody{ display:block; }
+  .miniCard{ background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.07); border-radius:15px; padding:15px; margin-top:16px; }
+  .actionRow{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .actionRow button{ margin-top:0; }
+  .toast{ position:fixed; left:50%; bottom:18px; transform:translateX(-50%); background:rgba(6,13,25,.92); border:1px solid var(--line); color:var(--text); padding:11px 14px; border-radius:999px; font-size:13px; z-index:1000; max-width:min(560px, calc(100% - 24px)); text-align:center; box-shadow:var(--shadow); }
+  .modal{ position:fixed; inset:0; background:rgba(0,0,0,.60); display:flex; align-items:center; justify-content:center; z-index:1001; padding:18px; pointer-events:auto; }
+  .modal-card{ width:min(700px,100%); background:linear-gradient(180deg, rgba(16,31,58,.98), rgba(15,26,48,.98)); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:0 18px 40px rgba(0,0,0,.35); }
+  .modal-title{ font-weight:800; margin-bottom:8px; font-size:16px; letter-spacing:.2px; }
+  .modal-body{ color:var(--text-soft); font-size:13px; line-height:1.7; }
+  .modal-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:14px; flex-wrap:wrap; }
+  .modal.hidden { display:none; } #modalCard { pointer-events:auto; }
+  a{ color:#7fb0ff; text-decoration:none; } a:hover{ color:#a6c7ff; text-decoration:underline; }
+  .colorGrid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:14px; }
+  .colorItem{ background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); border-radius:16px; padding:14px; }
+  .colorPreview{ height:54px; border-radius:12px; border:1px solid rgba(255,255,255,.14); margin-bottom:10px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); }
+  .colorLabel{ font-size:13px; font-weight:800; color:var(--text); margin-bottom:6px; }
+  .colorSub{ font-size:12px; line-height:1.6; color:var(--muted); }
+  #loginView{ width:min(460px,100%); margin:10vh auto 0 auto; }
+  .authTitle{ font-size:24px; font-weight:900; letter-spacing:.2px; margin-bottom:4px; }
+  .authSub{ font-size:13px; color:var(--muted); line-height:1.7; }
+  .panelIntro{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  .panelIntro .meta{ display:flex; flex-direction:column; gap:3px; }
+  .appName{ font-weight:900; font-size:19px; letter-spacing:.2px; }
+  .topQuickRow{ display:flex; gap:12px; flex-wrap:wrap; margin-top:14px; }
+  .quickMiniCard{ flex:1 1 280px; background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:16px; padding:14px; }
+  .quickMiniTitle{ font-size:13px; font-weight:800; color:var(--text); margin-bottom:6px; }
+  .quickMiniSub{ font-size:12px; color:var(--muted); line-height:1.6; margin-bottom:10px; }
+  .pill{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:rgba(59,130,246,.15); border:1px solid rgba(59,130,246,.22); color:var(--text); font-size:12px; font-weight:700; }
+  .miniMuted{ font-size:12px; color:var(--muted); }
+  body.booting #loginView, body.booting #appView{ display:none!important; }
+  #bootScreen{ display:none; }
+  body.booting #bootScreen{ display:flex; min-height:100vh; align-items:center; justify-content:center; }
+  .bootCard{ width:min(420px, calc(100% - 24px)); padding:20px; border-radius:18px; border:1px solid var(--line); background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025)); box-shadow:var(--shadow); backdrop-filter:blur(8px); text-align:center; }
+  .bootTitle{ font-size:18px; font-weight:800; margin-bottom:8px; }
+  .bootSub{ font-size:13px; color:var(--muted); }
+  .mobileActionBar{ display:none; }
+  .loginBtnRow{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:12px; align-items:stretch; }
+  .loginBtnRow button{ margin-top:0; width:100%; min-height:44px; padding:11px 12px; display:flex; align-items:center; justify-content:center; text-align:center; white-space:nowrap; }
+  @media (max-width:900px){ .colorGrid{ grid-template-columns:1fr; } }
+  @media (max-width:720px){
+    .container{ padding:12px; } .row{ grid-template-columns:1fr; } iframe{ height:64vh; } button{ width:100%; font-size:14px; font-weight:800; padding:12px 14px; border-radius:14px; }
+    .tabs{ gap:10px; display:grid; grid-template-columns:1fr 1fr; } .tab{ flex:1 1 auto; text-align:center; width:100%; }
+    table{ display:block; overflow-x:auto; -webkit-overflow-scrolling:touch; } .toolbarRow .btnWrap{ flex-direction:column; align-items:stretch; } #loginView{ margin-top:8vh; }
+    .toolbarCard{ position:static; padding:12px; } .btnWrap{ display:grid!important; grid-template-columns:1fr; gap:8px; } .btnWrap button, .actionRow button, .sectionBody button{ width:100%; border-radius:14px; min-height:44px; font-size:14px; }
+    .previewBox{ overflow:hidden; border-radius:16px; } iframe{ width:100%; height:72vh; border:0; overflow:auto; -webkit-overflow-scrolling:touch; touch-action:pan-x pan-y; }
+    .mobileActionBar{ display:grid; grid-template-columns:1fr 1fr; gap:8px; position:sticky; bottom:10px; z-index:20; margin-top:14px; }
+    .mobileActionBar button{ margin-top:0; min-height:46px; }
+    .sectionHead{ padding:14px; } .sectionHead .title{ font-size:14px; } .sectionHead .sub{ font-size:11px; } .quickMiniCard, .miniCard, .sectionCard, .card{ border-radius:16px; } table th, table td{ padding:10px 8px; font-size:12px; }
+    .loginBtnRow{ grid-template-columns:1fr; gap:10px; }
+  }
+</style>
+</head>
+<body class="booting">
+  <div id="bootScreen"><div class="bootCard"><div class="bootTitle">Memulihkan sesi...</div><div class="bootSub">Mohon tunggu sebentar</div></div></div>
+  <div class="container">
+    <div id="loginView" class="card hidden">
+      <div class="authHeader">
+        <div class="authTitle">Masuk ke Sistem</div>
+        <div class="authSub">Kelola Laporan Kinerja Harian dengan tampilan yang lebih rapi, cepat, dan nyaman digunakan.</div>
+      </div>
+      <label for="loginUsername">Username</label>
+      <input id="loginUsername" autocomplete="username" placeholder="Masukkan username">
+      <label for="loginPass">Password</label>
+      <input id="loginPass" type="password" autocomplete="current-password" placeholder="Masukkan password">
+      <div class="loginBtnRow">
+        <button type="button" id="btnLogin">Masuk</button>
+        <button type="button" class="secondary" id="btnForgot">Lupa Password</button>
+        <button type="button" class="secondary" id="btnRegister">Daftar Akun Baru</button>
+      </div>
+      <div id="loginStatus" class="hint"></div>
+    </div>
+
+    <div id="appView" class="hidden">
+      <div class="card">
+        <div class="panelIntro">
+          <div class="meta">
+            <div class="appName">Aplikasi Laporan Kinerja Harian</div>
+            <div class="pageSub" id="whoami"></div>
+          </div>
+          <div><button class="secondary" type="button" id="btnLogout">Logout</button></div>
+        </div>
+        <div class="tabs">
+          <div class="tab active" id="tabLhk" data-tab="lhk">Penyusunan LKH</div>
+          <div class="tab" id="tabFiles" data-tab="files">Dokumen Saya</div>
+          <div class="tab" id="tabPass" data-tab="pass">Akun</div>
+          <div class="tab hidden" id="tabAdmin" data-tab="admin">Administrasi</div>
+        </div>
+        <div class="topQuickRow hidden" id="adminQuickRow">
+          <div class="quickMiniCard">
+            <div class="quickMiniTitle">Inbox Admin Ringkas</div>
+            <div class="quickMiniSub">Notifikasi terbaru ditampilkan di sini agar langsung terlihat tanpa masuk dulu ke section inbox.</div>
+            <div id="adminQuickInbox" class="miniMuted">Belum dimuat.</div>
+          </div>
+          <div class="quickMiniCard">
+            <div class="quickMiniTitle">User Online</div>
+            <div class="quickMiniSub">Menampilkan user yang masih aktif berdasarkan heartbeat sesi.</div>
+            <div id="adminOnlineSummary" class="miniMuted">Belum dimuat.</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="viewLhk" class="card">
+        <h3>Formulir LKH</h3>
+        <div class="pageSub">Lengkapi identitas, periode laporan, preferensi tampilan, lalu buat preview atau export PDF sesuai kebutuhan.</div>
+        <div class="toolbarCard">
+          <div class="toolbarRow">
+            <div>
+              <label for="pdfMode">Mode PDF</label>
+              <select id="pdfMode">
+                <option value="auto" selected>Otomatis Fit 1 Halaman</option>
+                <option value="default">Standar</option>
+                <option value="fit1">Fit 1 Halaman</option>
+                <option value="fit1meeting">Fit 1 Halaman Rapat</option>
+                <option value="landscapefit1">Landscape 1 Halaman</option>
+              </select>
+            </div>
+            <div class="btnWrap">
+              <button type="button" id="btnPreview">Generate Preview</button>
+              <button type="button" class="secondary" id="btnDownload">Download PDF</button>
+              <button type="button" class="secondary" id="btnDownloadExcel">Download Excel</button>
+              <button type="button" class="secondary" id="btnPrint">Print</button>
+            </div>
+          </div>
+          <div id="status" class="hint"></div>
+        </div>
+
+        <div class="sectionGroup">
+          <div class="sectionCard open" id="secLhkForm">
+            <button type="button" class="sectionHead" onclick="toggleSection('secLhkForm')"><span class="left"><span class="title">Data Formulir</span><span class="sub">Lengkapi data pegawai, periode laporan, pengaturan atasan, dan tanda tangan dokumen.</span></span><span class="chev">⌄</span></button>
+            <div class="sectionBody">
+              <div class="row">
+                <div><label for="nama">Nama</label><input id="nama" disabled></div>
+                <div><label for="nip">NIP</label><input id="nip" disabled></div>
+              </div>
+              <div class="row">
+                <div><label for="subBagian">Sub Bagian</label><select id="subBagian"></select></div>
+                <div><label for="jabatan">Jabatan</label><input id="jabatan" placeholder="Masukkan jabatan"></div>
+              </div>
+              <div class="row">
+                <div><label for="month">Bulan</label>
+                  <select id="month">
+                    <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option><option value="4">April</option>
+                    <option value="5">Mei</option><option value="6">Juni</option><option value="7">Juli</option><option value="8">Agustus</option>
+                    <option value="9">September</option><option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                  </select>
+                </div>
+                <div><label for="year">Tahun</label><input id="year" type="number" placeholder="Contoh: 2026"></div>
+              </div>
+              <label for="kota">Kota</label><input id="kota" placeholder="Masukkan nama kota">
+              <label for="holidays">Hari Libur Tambahan (Opsional)</label><input id="holidays" placeholder="Contoh: 1 10 17 atau 1,10,17 atau 2026-03-29"><div class="hint">Isi tanggal tambahan bila ada hari libur khusus di luar kalender otomatis.</div>
+              <div class="row">
+                <div><label for="fontOut">Ukuran Font di Luar Tabel</label><select id="fontOut"><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12" selected>12</option><option value="13">13</option><option value="14">14</option></select></div>
+                <div><label for="fontIn">Ukuran Font di Dalam Tabel</label><select id="fontIn"><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12" selected>12</option><option value="13">13</option><option value="14">14</option></select></div>
+              </div>
+              <label for="jabatanPembuat">Jabatan Pembuat</label><input id="jabatanPembuat" disabled><div class="hint">Terisi otomatis mengikuti jabatan yang Anda input.</div>
+              <label for="jabatanAtasan">Jabatan Atasan</label><select id="jabatanAtasan"></select>
+              <div class="row">
+                <div><label for="namaAtasan">Nama Atasan</label><select id="namaAtasan"></select></div>
+                <div><label for="nipAtasan">NIP Atasan</label><input id="nipAtasan" disabled><div class="hint">NIP atasan akan terisi otomatis berdasarkan data yang tersimpan.</div></div>
+              </div>
+              <label for="signatureMode">Mode Tanda Tangan</label>
+              <select id="signatureMode"><option value="text" selected>Teks biasa</option><option value="barcode">Barcode / QR otomatis</option><option value="image">Upload gambar tanda tangan</option></select>
+              <div class="hint">Pilih mode barcode untuk QR otomatis, atau upload gambar jika ingin memakai tanda tangan hasil scan.</div>
+              <div id="sigUploadRow" class="row hidden" style="margin-top:10px;">
+                <div><label for="sigPembuatFile">Upload Tanda Tangan Pembuat (PNG/JPG)</label><input id="sigPembuatFile" type="file" accept="image/*"></div>
+                <div><label for="sigAtasanFile">Upload Tanda Tangan Atasan (PNG/JPG)</label><input id="sigAtasanFile" type="file" accept="image/*"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sectionCard" id="secLhkColors">
+            <button type="button" class="sectionHead" onclick="toggleSection('secLhkColors')"><span class="left"><span class="title">Preferensi Tampilan Dokumen</span><span class="sub">Atur warna dokumen secara visual agar preview dan hasil PDF lebih enak dilihat.</span></span><span class="chev">⌄</span></button>
+            <div class="sectionBody">
+              <div class="pageSub" style="margin-top:12px;">Atur tampilan warna dokumen dengan cara yang lebih visual. Warna yang dipilih akan langsung dipakai saat preview dan export PDF.</div>
+              <div class="colorGrid">
+                <div class="colorItem"><div class="colorPreview" id="previewColorHeader" style="background:#dbeafe;"></div><div class="colorLabel">Warna Header Tabel</div><div class="colorSub">Dipakai untuk baris judul kolom tabel.</div><label for="colorHeader">Pilih warna</label><input id="colorHeader" type="color" value="#dbeafe"></div>
+                <div class="colorItem"><div class="colorPreview" id="previewColorDateCol" style="background:#f3f4f6;"></div><div class="colorLabel">Warna Kolom Hari / Tanggal</div><div class="colorSub">Mewarnai kolom tanggal agar lebih mudah dibaca.</div><label for="colorDateCol">Pilih warna</label><input id="colorDateCol" type="color" value="#f3f4f6"></div>
+                <div class="colorItem"><div class="colorPreview" id="previewColorOffRow" style="background:#fef3c7;"></div><div class="colorLabel">Warna Hari Libur / Akhir Pekan</div><div class="colorSub">Dipakai saat opsi sorot hari non-kerja diaktifkan.</div><label for="colorOffRow">Pilih warna</label><input id="colorOffRow" type="color" value="#fef3c7"></div>
+              </div>
+              <div class="row" style="margin-top:14px;">
+                <div><label for="enableOffHighlight">Sorot Hari Libur / Akhir Pekan</label><select id="enableOffHighlight"><option value="no" selected>Tidak disorot</option><option value="yes">Sorot otomatis</option></select></div>
+                <div><label for="showSubHead">Baris Sub-Header (1, 2, 3, 4, 5)</label><select id="showSubHead"><option value="yes" selected>Tampilkan</option><option value="no">Sembunyikan</option></select></div>
+              </div>
+              <div class="row" style="margin-top:14px;">
+                <div><label for="hideSaturday">Hari Sabtu</label><select id="hideSaturday"><option value="no" selected>Tampilkan</option><option value="yes">Sembunyikan</option></select></div>
+                <div><label for="hideSunday">Hari Minggu</label><select id="hideSunday"><option value="no" selected>Tampilkan</option><option value="yes">Sembunyikan</option></select></div>
+              </div>
+              <div class="row" style="margin-top:14px;">
+                <div><label for="showKet">Kolom Keterangan (Ket.)</label><select id="showKet"><option value="yes" selected>Tampilkan</option><option value="no">Sembunyikan</option></select></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sectionCard" id="secLhkDraft">
+            <button type="button" class="sectionHead" onclick="toggleSection('secLhkDraft')"><span class="left"><span class="title">Draft</span><span class="sub">Simpan draft, buka kembali data sebelumnya, lalu lanjutkan pekerjaan tanpa mengulang dari awal.</span></span><span class="chev">⌄</span></button>
+            <div class="sectionBody">
+              <div class="row">
+                <div><label for="draftSelect">Daftar Draft</label><select id="draftSelect"></select><div class="hint">Setiap draft disimpan berdasarkan bulan dan tahun laporan.</div></div>
+                <div><label>&nbsp;</label><button type="button" class="secondary" id="btnRefreshDrafts">Refresh Draft</button></div>
+              </div>
+              <div class="row"><button type="button" class="secondary" id="btnSaveDraft">Simpan Draft</button><button type="button" id="btnLoadDraft">Muat Draft</button></div>
+              <button type="button" class="danger" id="btnDeleteDraft">Hapus Draft Terpilih</button>
+            </div>
+          </div>
+
+          <div class="sectionCard open" id="secLhkPreview">
+            <button type="button" class="sectionHead" onclick="toggleSection('secLhkPreview')"><span class="left"><span class="title">Preview</span><span class="sub">Tinjau hasil dokumen sebelum diunduh agar susunan tabel dan isi laporan sudah sesuai.</span></span><span class="chev">⌄</span></button>
+            <div class="sectionBody">
+              <div class="previewBox"><iframe id="preview"></iframe></div>
+              <div class="mobileActionBar"><button type="button" id="btnPreviewMobile">Preview</button><button type="button" class="secondary" id="btnDownloadMobile">PDF</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="viewFiles" class="card hidden">
+        <h3>Dokumen Saya</h3><div class="pageSub">Lihat dokumen yang sudah tersimpan, lalu buka folder kerja pribadi Anda kapan saja.</div>
+        <div class="sectionGroup"><div class="sectionCard open" id="secFilesList"><button type="button" class="sectionHead" onclick="toggleSection('secFilesList')"><span class="left"><span class="title">Daftar Dokumen</span><span class="sub">Perbarui daftar file dan buka folder pribadi untuk melihat hasil kerja yang sudah tersimpan.</span></span><span class="chev">⌄</span></button><div class="sectionBody"><div class="actionRow" style="margin-top:12px;"><button type="button" id="btnRefreshFiles">Refresh List</button><button type="button" class="secondary" id="btnOpenFolder">Buka Folder Saya</button></div><div class="hint" id="filesStatus"></div><div id="filesTable" style="margin-top:10px;"></div></div></div></div>
+      </div>
+
+      <div id="viewPass" class="card hidden">
+        <h3>Akun</h3><div class="pageSub">Kelola upload LHK, ubah password, dan perbarui email akun dari satu tempat.</div>
+        <div class="sectionGroup">
+          <div class="sectionCard open" id="secUploadLhk"><button type="button" class="sectionHead" onclick="toggleSection('secUploadLhk')"><span class="left"><span class="title">Unggah LHK (PDF)</span><span class="sub">Pilih folder tujuan, lalu unggah file PDF LHK ke lokasi yang sudah disediakan.</span></span><span class="chev">⌄</span></button><div class="sectionBody"><div class="hint">Pastikan file yang diunggah sudah berbentuk PDF.</div><label for="uploadFolder">Folder Tujuan</label><select id="uploadFolder"></select><label for="uploadFile">File PDF</label><input id="uploadFile" type="file" accept="application/pdf"><button type="button" id="btnUploadLhk">Upload LHK</button><div class="hint" id="uploadStatus"></div></div></div>
+          <div class="sectionCard" id="secChangePassword"><button type="button" class="sectionHead" onclick="toggleSection('secChangePassword')"><span class="left"><span class="title">Ganti Password</span><span class="sub">Ubah password akun secara mandiri untuk menjaga keamanan akses.</span></span><span class="chev">⌄</span></button><div class="sectionBody"><label for="oldPass">Password Lama</label><input id="oldPass" type="password" placeholder="Masukkan password lama"><label for="newPass">Password Baru</label><input id="newPass" type="password" placeholder="Masukkan password baru"><button type="button" id="btnChangePass">Simpan Password</button><div class="hint" id="passStatus"></div></div></div>
+          <div class="sectionCard" id="secChangeEmail"><button type="button" class="sectionHead" onclick="toggleSection('secChangeEmail')"><span class="left"><span class="title">Ganti Email</span><span class="sub">Perbarui alamat email agar notifikasi dan proses reset password tetap berjalan normal.</span></span><span class="chev">⌄</span></button><div class="sectionBody"><label for="newEmail">Email Baru</label><input id="newEmail" type="email" placeholder="user@domain.com"><button type="button" class="secondary" id="btnChangeEmail">Simpan Email</button><div class="hint" id="emailStatus"></div></div></div>
+        </div>
+      </div>
+
+      <div id="viewAdmin" class="card hidden">
+        <h3>Administrasi</h3><div class="pageSub">Kelola folder upload, inbox admin, pengguna, dan log aktivitas aplikasi.</div>
+        <div class="sectionGroup">
+          <div class="sectionCard open" id="secAdminUpload"><button type="button" class="sectionHead" onclick="toggleSection('secAdminUpload')"><span class="left"><span class="title">Folder Upload LHK</span><span class="sub">Atur root folder upload dan buat folder tujuan yang akan dipilih pengguna saat mengunggah file.</span></span><span class="chev">⌄</span></button><div class="sectionBody"><div class="hint">Atur folder root upload dan kelola subfolder tujuan upload pengguna dari sini.</div><div class="row"><div><label for="uploadRootId">Upload Root Folder ID</label><input id="uploadRootId" placeholder="Masukkan folder ID root upload"><div class="hint" id="uploadRootHint"></div></div><div><label>&nbsp;</label><button type="button" class="secondary" id="btnAdminSaveUploadRoot">Simpan Root</button></div></div><div class="row" style="margin-top:10px;"><div><label for="newUploadFolderName">Nama Subfolder Baru</label><input id="newUploadFolderName" placeholder="Contoh: LHK Maret 2026"></div><div><label>&nbsp;</label><button type="button" id="btnAdminCreateUploadFolder">Buat Folder</button></div></div><button type="button" class="secondary" id="btnAdminRefreshUploadFolders">Refresh Daftar Folder</button><div class="hint" id="adminUploadStatus"></div><div id="adminUploadFoldersTable" style="margin-top:10px;"></div></div></div>
+          <div class="sectionCard" id="secAdminNotif"><button type="button" class="sectionHead" onclick="toggleSection('secAdminNotif')"><span class="left"><span class="title">Inbox Admin</span><span class="sub">Pantau notifikasi unggahan dan aktivitas penting yang masuk ke administrator.</span></span><span class="chev">⌄</span></button><div class="sectionBody"><div class="hint">Gunakan inbox ini untuk melihat unggahan masuk dan menandai notifikasi yang sudah ditangani.</div><div class="actionRow" style="margin-top:12px;"><button type="button" class="secondary" id="btnAdminRefreshNotifications">Refresh Inbox</button><button type="button" class="danger" id="btnAdminClearNotifications">Hapus Semua Notif</button></div><div class="hint" id="adminNotifStatus"></div><div id="adminNotifTable" style="margin-top:10px;"></div></div></div>
+          <div class="sectionCard" id="secAdminOnlineUsers"><button type="button" class="sectionHead" onclick="toggleSection('secAdminOnlineUsers')"><span class="left"><span class="title">User Online</span><span class="sub">Lihat siapa saja yang sedang aktif menggunakan aplikasi berdasarkan heartbeat sesi.</span></span><span class="chev">⌄</span></button><div class="sectionBody"><div class="actionRow" style="margin-top:12px;"><button type="button" class="secondary" id="btnAdminRefreshOnlineUsers">Refresh User Online</button></div><div class="hint" id="adminOnlineStatus"></div><div id="adminOnlineUsersTable" style="margin-top:10px;"></div></div></div>
+          <div class="sectionCard" id="secAdminUsers"><button type="button" class="sectionHead" onclick="toggleSection('secAdminUsers')"><span class="left"><span class="title">Manajemen Pengguna</span><span class="sub">Lihat daftar pengguna, tambah akun baru, ubah role, reset password, atau hapus pengguna yang tidak diperlukan.</span></span><span class="chev">⌄</span></button><div class="sectionBody"><button type="button" id="btnAdminLoadUsers">Muat Daftar User</button><div class="hint" id="adminStatus"></div><div id="adminUsersTable" style="margin-top:10px;"></div><div class="miniCard"><h4>Tambah Pengguna</h4><label for="newUserNama">Nama</label><input id="newUserNama" placeholder="Masukkan nama pengguna"><label for="newUserUsername">Username</label><input id="newUserUsername" placeholder="Contoh: user001"><label for="newUserNip">NIP</label><input id="newUserNip" placeholder="Masukkan NIP"><label for="newUserEmail">Email</label><input id="newUserEmail" type="email" placeholder="user@domain.com"><label for="newUserPass">Password</label><input id="newUserPass" type="password" placeholder="Masukkan password awal"><label for="newUserRole">Role</label><select id="newUserRole"><option value="user" selected>user</option><option value="sekretaris">sekretaris</option><option value="admin">admin</option></select><button type="button" id="btnAdminCreateUser">Tambah User</button><div class="hint" style="margin-top:10px;">Aksi reset password dan hapus user tersedia langsung dari tabel daftar pengguna.</div></div></div></div>
+          <div class="sectionCard" id="secAdminLogs"><button type="button" class="sectionHead" onclick="toggleSection('secAdminLogs')"><span class="left"><span class="title">Log Aktivitas</span><span class="sub">Pantau riwayat login, export PDF, upload file, dan aktivitas admin lainnya.</span></span><span class="chev">⌄</span></button><div class="sectionBody"><div class="hint">Menampilkan hingga 500 log terbaru pada antarmuka admin.</div><div class="actionRow" style="margin-top:12px;"><button type="button" class="secondary" id="btnAdminRefreshLogs">Refresh Log</button><button type="button" class="danger" id="btnAdminClearLogs">Hapus Semua Log</button></div><div class="hint" id="adminLogsStatus"></div><div id="adminLogsTable" style="margin-top:10px;"></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+    <div id="modal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card" id="modalCard"><div style="display:flex; align-items:center; justify-content:space-between; gap:10px;"><div class="modal-title" id="modalTitle">Informasi</div><button type="button" class="secondary" id="modalCloseBtn" style="margin-top:0; padding:6px 10px;">✕</button></div><div class="modal-body" id="modalBody"></div><div class="modal-actions" id="modalActions"></div></div></div>
+  </div>
+
+<script src="/config.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(()=>{}));
+  }
+
+  let token = '';
+  let sessionUser = null;
+  let authNonce = 0;
+  let currentDays = [];
+  let sigPembuatB64 = '';
+  let sigAtasanB64 = '';
+  let atasanOptions = [];
+  let heartbeatTimer = null;
+  const TOKEN_KEY = 'lhk_token_v1';
+
+  function bumpAuthNonce(){ authNonce++; return authNonce; }
+  const $ = id => document.getElementById(id);
+
+  async function apiCall(api, payload = {}, tokenOverride = token){
+    const res = await fetch(`/api/${encodeURIComponent(api)}`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ token: tokenOverride || '', payload: payload || {} })
+    });
+    const data = await res.json().catch(() => ({ ok:false, message:'Respons API tidak valid' }));
+    if (!res.ok || (data && data.ok === false)) {
+      throw new Error(data?.message || data?.error || `HTTP ${res.status}`);
+    }
+    return data;
+  }
+
+  function readFileAsB64(file, cb){
+    const r = new FileReader();
+    r.onload = () => {
+      const s = String(r.result || '');
+      const m = s.match(/^data:.+;base64,(.*)$/);
+      cb(m ? m[1] : '');
+    };
+    r.onerror = () => cb('');
+    r.readAsDataURL(file);
+  }
+
+  function bindLoginEnterBehavior(){
+    const userEl = $('loginUsername');
+    const passEl = $('loginPass');
+    if (userEl) userEl.addEventListener('keydown', (e)=>{ if (e.key === 'Enter'){ e.preventDefault(); passEl && passEl.focus(); } });
+    if (passEl) passEl.addEventListener('keydown', (e)=>{ if (e.key === 'Enter'){ e.preventDefault(); doLogin(); } });
+  }
+  function setLoginStatus(msg){ if ($('loginStatus')) $('loginStatus').textContent = msg || ''; }
+  function setStatus(msg){ if ($('status')) $('status').textContent = msg || ''; }
+
+  function showLogin(){
+    $('loginView')?.classList.remove('hidden');
+    $('appView')?.classList.add('hidden');
+    document.body.style.display = 'flex';
+    document.body.style.alignItems = 'center';
+    document.body.style.justifyContent = 'center';
+    document.body.style.minHeight = '100vh';
+  }
+
+  function showApp(){
+    $('loginView')?.classList.add('hidden');
+    $('appView')?.classList.remove('hidden');
+    document.body.style.display = '';
+    document.body.style.alignItems = '';
+    document.body.style.justifyContent = '';
+    document.body.style.minHeight = '';
+  }
+
+  function showTab(name){
+    ['lhk','files','pass','admin'].forEach(t=>{
+      document.getElementById('view' + t.charAt(0).toUpperCase() + t.slice(1))?.classList.add('hidden');
+      document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1))?.classList.remove('active');
+    });
+    document.getElementById('view' + name.charAt(0).toUpperCase() + name.slice(1))?.classList.remove('hidden');
+    document.getElementById('tab' + name.charAt(0).toUpperCase() + name.slice(1))?.classList.add('active');
+    if (name === 'files') refreshFiles();
+    if (name === 'pass') refreshUploadFolders();
+    if (name === 'admin') {
+      adminRefreshUploadRoot(); adminRefreshUploadFolders(); adminRefreshNotifications(); adminRefreshNotificationsQuick(); adminRefreshOnlineUsers(); adminLoadUsers(); adminRefreshLogs();
+    }
+  }
+  function toggleSection(id){ document.getElementById(id)?.classList.toggle('open'); }
+  function openSection(id){ document.getElementById(id)?.classList.add('open'); }
+  function closeSection(id){ document.getElementById(id)?.classList.remove('open'); }
+  function setupDefaultSections(){
+    openSection('secLhkForm'); closeSection('secLhkColors'); closeSection('secLhkDraft'); openSection('secLhkPreview');
+    openSection('secFilesList'); openSection('secUploadLhk'); closeSection('secChangePassword'); closeSection('secChangeEmail');
+    openSection('secAdminUpload'); closeSection('secAdminNotif'); closeSection('secAdminOnlineUsers'); closeSection('secAdminUsers'); closeSection('secAdminLogs');
+  }
+
+  function saveTokenLocal(t){ try{ if (t) localStorage.setItem(TOKEN_KEY, t); else localStorage.removeItem(TOKEN_KEY); }catch(e){} }
+  function loadTokenLocal(){ try{ return localStorage.getItem(TOKEN_KEY) || ''; }catch(e){ return ''; } }
+
+  async function tryAutoLogin(){
+    const t = loadTokenLocal();
+    if (!t){ finishBoot(); showLogin(); return; }
+    const n = bumpAuthNonce();
+    try {
+      const res = await apiCall('getSession', {}, t);
+      if (n !== authNonce) return;
+      token = t; sessionUser = res.user || null; finishBoot(); afterLogin(true);
+    } catch (e) {
+      if (n !== authNonce) return;
+      saveTokenLocal(''); finishBoot(); showLogin();
+    }
+  }
+
+  async function doLogin(){
+    const username = ($('loginUsername')?.value || '').trim();
+    const pass = $('loginPass')?.value || '';
+    if (!username || !pass){ setLoginStatus('Isi username dan password terlebih dahulu.'); return; }
+    setLoginStatus('Sedang login...');
+    const n = bumpAuthNonce();
+    try{
+      const res = await apiCall('login', { username, password: pass }, '');
+      if (n !== authNonce) return;
+      token = res.token || ''; sessionUser = res.user || null; saveTokenLocal(token);
+      try { modalHide(); } catch(e){}
+      afterLogin(false);
+    }catch(err){
+      if (n !== authNonce) return;
+      setLoginStatus(err?.message || String(err));
+    }
+  }
+
+  function startHeartbeat(){
+    stopHeartbeat(); if (!token) return;
+    apiCall('heartbeat').catch(()=>{});
+    heartbeatTimer = setInterval(()=>{ if (token) apiCall('heartbeat').catch(()=>{}); }, 60000);
+  }
+  function stopHeartbeat(){ if (heartbeatTimer){ clearInterval(heartbeatTimer); heartbeatTimer = null; } }
+
+  function doLogout(){
+    bumpAuthNonce();
+    const t = token;
+    stopHeartbeat();
+    if (window.__syncTimer) { clearInterval(window.__syncTimer); window.__syncTimer = null; }
+    token = ''; sessionUser = null; currentDays = []; sigPembuatB64 = ''; sigAtasanB64 = ''; atasanOptions = [];
+    saveTokenLocal('');
+    try { $('preview').srcdoc = ''; } catch(e){}
+    try { setStatus(''); setLoginStatus(''); $('loginUsername').value=''; $('loginPass').value=''; } catch(e){}
+    showLogin(); showTab('lhk');
+    apiCall('logout', {}, t).catch(()=>{});
+  }
+
+  function fillSelect(id, arr){ const sel = $(id); if (!sel) return; sel.innerHTML = ''; (arr||[]).forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o); }); }
+  function fillAtasanSelect(arr){
+    atasanOptions = Array.isArray(arr) ? arr : [];
+    const sel = $('namaAtasan'); if (!sel) return;
+    sel.innerHTML = '';
+    atasanOptions.forEach(x=>{ const o=document.createElement('option'); o.value=x.nama||''; o.textContent=x.nama||''; sel.appendChild(o); });
+    syncAtasanNip();
+  }
+  function syncAtasanNip(){ const sel=$('namaAtasan'), nip=$('nipAtasan'); if (!sel || !nip) return; const picked = atasanOptions.find(x=>String(x.nama||'')===String(sel.value||'')); nip.value = picked ? (picked.nip||'') : ''; }
+  function bindColorPreview(idInput,idPreview){ const input=$(idInput), preview=$(idPreview); if (!input||!preview) return; const sync=()=> preview.style.background=input.value||'#ffffff'; input.oninput=sync; sync(); }
+
+  async function afterLogin(isAuto){
+    if (!sessionUser) return;
+    showApp();
+    if ($('whoami')) $('whoami').textContent = `${sessionUser.nama} (${sessionUser.nip}) - ${sessionUser.role}`;
+    if ($('nama')) $('nama').value = sessionUser.nama || '';
+    if ($('nip')) $('nip').value = sessionUser.nip || '';
+    const isAdminLike = String(sessionUser.role || '').toLowerCase() === 'admin';
+    if ($('tabAdmin')) $('tabAdmin').classList.toggle('hidden', !isAdminLike);
+    if ($('adminQuickRow')) $('adminQuickRow').classList.toggle('hidden', !isAdminLike);
+
+    const now = new Date();
+    if ($('month')) $('month').value = String(now.getMonth() + 1);
+    if ($('year')) $('year').value = String(now.getFullYear());
+
+    if (window.__holidayPlaceholderHandler) {
+      $('month')?.removeEventListener('change', window.__holidayPlaceholderHandler);
+      $('year')?.removeEventListener('change', window.__holidayPlaceholderHandler);
+    }
+    window.__holidayPlaceholderHandler = ()=>{ resetCurrentDaysIfPeriodChanged(); updateHolidayPlaceholder(false); };
+    $('month')?.addEventListener('change', window.__holidayPlaceholderHandler);
+    $('year')?.addEventListener('change', window.__holidayPlaceholderHandler);
+
+    window.__lastPeriodMonth = Number(now.getMonth() + 1);
+    window.__lastPeriodYear = Number(now.getFullYear());
+
+    const jab = $('jabatan'); const jp = $('jabatanPembuat'); if (jp) jp.disabled = true;
+    window.__mirrorJabatanPembuat = ()=>{ if (jp) jp.value = (jab && jab.value) ? jab.value : ''; };
+    if (jab) jab.oninput = window.__mirrorJabatanPembuat;
+
+    try {
+      const opt = await apiCall('getOptions');
+      fillSelect('subBagian', opt?.subBagian || []);
+      fillSelect('jabatanAtasan', opt?.kasubbag || []);
+      fillAtasanSelect(opt?.atasanList || []);
+      if ($('namaAtasan')) $('namaAtasan').onchange = syncAtasanNip;
+
+      const res = await apiCall('getMyPrefs');
+      const p = res?.prefs || {};
+      const set = (id,v)=>{ if ($(id)) $(id).value = v ?? ''; };
+      set('subBagian', p.subBagian || $('subBagian')?.value || '');
+      set('jabatan', p.jabatan || '');
+      set('kota', p.kota || '');
+      set('jabatanPembuat', p.jabatanPembuat || '');
+      set('jabatanAtasan', p.jabatanAtasan || '');
+      set('namaAtasan', p.namaAtasan || '');
+      syncAtasanNip();
+      if (window.__mirrorJabatanPembuat) window.__mirrorJabatanPembuat();
+    } catch(e) {
+      toast('Gagal memuat preferensi: ' + (e?.message || e), 4000);
+    }
+
+    refreshDrafts();
+    refreshUploadFolders();
+
+    if ($('sigPembuatFile')) $('sigPembuatFile').onchange = () => {
+      const file = $('sigPembuatFile').files?.[0];
+      if (!file) { sigPembuatB64=''; return; }
+      readFileAsB64(file, (b64)=>{ sigPembuatB64 = b64 || ''; if (sigPembuatB64) toast('Tanda tangan pembuat berhasil dimuat'); });
+    };
+    if ($('sigAtasanFile')) $('sigAtasanFile').onchange = () => {
+      const file = $('sigAtasanFile').files?.[0];
+      if (!file) { sigAtasanB64=''; return; }
+      readFileAsB64(file, (b64)=>{ sigAtasanB64 = b64 || ''; if (sigAtasanB64) toast('Tanda tangan atasan berhasil dimuat'); });
+    };
+    if ($('signatureMode')) { $('signatureMode').removeEventListener('change', applySignatureModeUI); $('signatureMode').addEventListener('change', applySignatureModeUI); }
+
+    bindColorPreview('colorHeader', 'previewColorHeader');
+    bindColorPreview('colorDateCol', 'previewColorDateCol');
+    bindColorPreview('colorOffRow', 'previewColorOffRow');
+
+    applySignatureModeUI();
+    if (window.__mirrorJabatanPembuat) window.__mirrorJabatanPembuat();
+    setupDefaultSections();
+    startHeartbeat();
+
+    if (isAdminLike) { adminRefreshNotificationsQuick(); adminRefreshOnlineUsers(); }
+    updateHolidayPlaceholder(false);
+    if (!isAuto) toast('Login berhasil');
+  }
+
+  function resetCurrentDaysIfPeriodChanged(){
+    const month = Number($('month')?.value || 0), year = Number($('year')?.value || 0);
+    const prevMonth = Number(window.__lastPeriodMonth || 0), prevYear = Number(window.__lastPeriodYear || 0);
+    if (month !== prevMonth || year !== prevYear){ currentDays = []; window.__lastPeriodMonth = month; window.__lastPeriodYear = year; }
+  }
+
+  function getFormData(){
+    return {
+      nama: $('nama')?.value || '', nip: $('nip')?.value || '', subBagian: $('subBagian')?.value || '',
+      jabatan: $('jabatan')?.value || '', jabatanPembuat: $('jabatanPembuat')?.value || '', month: $('month')?.value || '',
+      year: $('year')?.value || '', kota: $('kota')?.value || '', holidays: $('holidays')?.value || '',
+      fontOut: $('fontOut')?.value || '12', fontIn: $('fontIn')?.value || '12',
+      colorHeader: $('colorHeader')?.value || '#dbeafe', colorDateCol: $('colorDateCol')?.value || '#f3f4f6',
+      colorOffRow: $('colorOffRow')?.value || '#fef3c7', enableOffHighlight: $('enableOffHighlight')?.value || 'no',
+      showSubHead: $('showSubHead')?.value || 'yes', showKet: $('showKet')?.value || 'yes', hideSaturday: $('hideSaturday')?.value || 'no',
+      hideSunday: $('hideSunday')?.value || 'no', jabatanAtasan: $('jabatanAtasan')?.value || '', namaAtasan: $('namaAtasan')?.value || '',
+      nipAtasan: $('nipAtasan')?.value || '', sigPembuatB64, sigAtasanB64, exportMode: false, signatureMode: $('signatureMode')?.value || 'text',
+      pdfMode: $('pdfMode')?.value || 'default', days: currentDays
+    };
+  }
+
+  async function updateHolidayPlaceholder(autoFill=false){
+    const month = $('month')?.value || '', year = $('year')?.value || '', holidaysEl = $('holidays');
+    if (!holidaysEl || !token || !month || !year) return;
+    try{
+      const res = await apiCall('getHolidayPlaceholderData', { month, year });
+      const placeholder = res?.placeholder || '', datesOnly = res?.datesOnly || '';
+      holidaysEl.placeholder = placeholder ? `Otomatis: ${placeholder}` : 'Contoh: 1 10 17 atau 1,10,17 atau 2026-03-29';
+      if (autoFill && !String(holidaysEl.value || '').trim() && datesOnly) holidaysEl.value = datesOnly;
+    }catch(e){
+      holidaysEl.placeholder = 'Contoh: 1 10 17 atau 1,10,17 atau 2026-03-29';
+    }
+  }
+
+  async function generatePreview(){
+    resetCurrentDaysIfPeriodChanged();
+    currentDays = [];
+    setStatus('Membuat preview...');
+    try {
+      const res = await apiCall('renderPreviewHtml', getFormData());
+      $('preview').srcdoc = res.html || '';
+      setStatus('Preview siap. Anda bisa menambah baris dan mengedit isi tabel langsung dari preview.');
+      setTimeout(()=> attachIframeSync(), 300);
+    } catch (err) { setStatus('Error: ' + (err?.message || err)); }
+  }
+
+  function attachIframeSync(){
+    const iframe = $('preview'); if (!iframe) return;
+    let doc = null; try { doc = iframe.contentDocument || iframe.contentWindow.document; } catch(e){ return; }
+    if (!doc) return;
+    syncRowsFromIframe();
+    doc.querySelectorAll('#tbl textarea').forEach(el=> el.addEventListener('input', ()=> syncRowsFromIframe()));
+    if (window.__syncTimer) clearInterval(window.__syncTimer);
+    window.__syncTimer = setInterval(syncRowsFromIframe, 500);
+  }
+
+  function syncRowsFromIframe(){
+    const iframe = $('preview'); if (!iframe) return;
+    let doc = null; try { doc = iframe.contentDocument || iframe.contentWindow.document; } catch(e){ return; }
+    if (!doc) return;
+    const oldMap = new Map((Array.isArray(currentDays) ? currentDays : []).map(d => [Number(d.day), { day:Number(d.day), activities:Array.isArray(d.activities)?d.activities.map(a=>({ uraian:a?.uraian??'', output:a?.output??'', ket:a?.ket??'' })) : [] }]));
+    const rows = Array.from(doc.querySelectorAll('#tbl tbody tr[data-day][data-act]')); const visibleDays = new Set();
+    rows.forEach(tr => { const day = Number(tr.getAttribute('data-day')); if (Number.isFinite(day)) visibleDays.add(day); });
+    visibleDays.forEach(day => oldMap.set(day, { day, activities:[] }));
+    rows.forEach(tr => {
+      const day = Number(tr.getAttribute('data-day')), act = Number(tr.getAttribute('data-act'));
+      if (!Number.isFinite(day) || !Number.isFinite(act)) return;
+      const prevDay = Array.isArray(currentDays) ? currentDays.find(d => Number(d.day) === day) : null;
+      const prevAct = prevDay?.activities?.[act] || { uraian:'', output:'', ket:'' };
+      const nextAct = { uraian: prevAct.uraian ?? '', output: prevAct.output ?? '', ket: prevAct.ket ?? '' };
+      tr.querySelectorAll('textarea[data-field]').forEach(el => { const field = el.getAttribute('data-field'); if (['uraian','output','ket'].includes(field)) nextAct[field] = el.value ?? ''; });
+      if (!oldMap.has(day)) oldMap.set(day, { day, activities:[] });
+      oldMap.get(day).activities[act] = nextAct;
+    });
+    const days = Array.from(oldMap.values()).sort((a,b)=>a.day - b.day);
+    days.forEach(d => { d.activities = (d.activities || []).filter(x => x); if (!d.activities.length) d.activities = [{ uraian:'', output:'', ket:'' }]; });
+    currentDays = days;
+  }
+
+  function dataUrlDownload(mimeType, base64, fileName){
+    const link = document.createElement('a');
+    link.href = `data:${mimeType};base64,${base64}`;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }
+
+  async function downloadExcel(){
+    resetCurrentDaysIfPeriodChanged(); setStatus('Membuat file Excel...');
+    try{
+      const res = await apiCall('exportExcel', getFormData());
+      dataUrlDownload(res.mimeType, res.base64, res.fileName || 'LHK.xlsx');
+      setStatus('Excel berhasil diunduh. File juga tersimpan di folder Anda: ' + (res.driveUrl || ''));
+    } catch(err){ setStatus('Error: ' + (err?.message || err)); }
+  }
+
+  async function downloadPdf(){
+    resetCurrentDaysIfPeriodChanged(); setStatus('Membuat PDF...');
+    try{
+      const form = getFormData(); form.exportMode = true;
+      const res = await apiCall('exportPdf', form);
+      dataUrlDownload(res.mimeType, res.base64, res.fileName || 'LHK.pdf');
+      setStatus('PDF berhasil diunduh. File juga tersimpan di folder Anda: ' + (res.driveUrl || ''));
+    } catch(err){ setStatus('Error: ' + (err?.message || err)); }
+  }
+
+  async function refreshFiles(){
+    if ($('filesStatus')) $('filesStatus').textContent = 'Memuat daftar dokumen...';
+    try{
+      const res = await apiCall('listMyFiles');
+      const rows = Array.isArray(res) ? res : (res?.list || []);
+      if ($('filesStatus')) $('filesStatus').textContent = `Total file: ${rows.length}`;
+      renderFilesTable(rows);
+    } catch(err){ if ($('filesStatus')) $('filesStatus').textContent = 'Error: ' + (err?.message || err); }
+  }
+  function renderFilesTable(list){
+    const box = $('filesTable'); if (!box) return;
+    if (!list?.length){ box.innerHTML = '<div class="hint">Belum ada file yang tersimpan.</div>'; return; }
+    box.innerHTML = '<table><tr><th>Nama File</th><th>Lokasi</th><th>Tanggal Dibuat</th><th>Akses</th></tr>' + list.map(f=>`<tr><td>${escapeHtml(f.name||'')}</td><td>${escapeHtml(f.location||'')}</td><td>${escapeHtml(f.created||'')}</td><td><a href="${f.url}" target="_blank" rel="noopener">Buka</a></td></tr>`).join('') + '</table>';
+  }
+
+  async function openFolder(){
+    try{
+      const res = await apiCall('getMyFolderUrl');
+      const url = res?.url || res;
+      if (url) window.open(url, '_blank', 'noopener');
+    }catch(e){ toast('Gagal membuka folder: ' + (e?.message || e)); }
+  }
+
+  async function refreshUploadFolders(){
+    const sel = $('uploadFolder'), status = $('uploadStatus'); if (!sel) return;
+    sel.innerHTML = ''; if (status) status.textContent = 'Memuat folder upload...';
+    try{
+      const res = await apiCall('listUploadFolders');
+      const rows = Array.isArray(res) ? res : (res?.list || []);
+      if (!rows.length){
+        const o = document.createElement('option'); o.value=''; o.textContent='(Belum ada folder upload)'; sel.appendChild(o);
+        if (status) status.textContent = 'Belum ada folder upload yang tersedia.'; return;
+      }
+      rows.forEach(x=>{ const o=document.createElement('option'); o.value=x.folderId; o.textContent=x.name||x.folderId; sel.appendChild(o); });
+      if (status) status.textContent = 'Pilih folder tujuan lalu unggah file PDF.';
+    }catch(err){ if (status) status.textContent = 'Error: ' + (err?.message || err); }
+  }
+
+  function uploadLhk(){
+    const folderId = $('uploadFolder')?.value || '', fileEl = $('uploadFile'), statusEl = $('uploadStatus'), file = fileEl?.files?.[0];
+    if (!folderId) { if (statusEl) statusEl.textContent = 'Pilih folder tujuan terlebih dahulu.'; return; }
+    if (!file) { if (statusEl) statusEl.textContent = 'Pilih file PDF terlebih dahulu.'; return; }
+    if (!String(file.name || '').toLowerCase().endsWith('.pdf')) { if (statusEl) statusEl.textContent = 'File harus berformat PDF.'; return; }
+    if (statusEl) statusEl.textContent = 'Mengunggah file...';
+    readFileAsB64(file, async (b64)=>{
+      if (!b64){ if (statusEl) statusEl.textContent = 'Gagal membaca file.'; return; }
+      try{
+        const res = await apiCall('uploadLhkPdf', { folderId, fileName: file.name, base64: b64 });
+        if (statusEl) statusEl.textContent = 'Upload berhasil: ' + (res.driveUrl || res.url || '');
+        toast('Upload berhasil. Admin akan menerima notifikasi.');
+        try { fileEl.value = ''; } catch(e){}
+      }catch(err){
+        if (statusEl) statusEl.textContent = 'Error: ' + (err?.message || err);
+        modalShow({ title:'Upload gagal', body: escapeHtml(err?.message || err) });
+      }
+    });
+  }
+
+  async function changePassword(){
+    if ($('passStatus')) $('passStatus').textContent = 'Menyimpan perubahan password...';
+    try{
+      await apiCall('changeMyPassword', { oldPassword: $('oldPass')?.value || '', newPassword: $('newPass')?.value || '' });
+      if ($('passStatus')) $('passStatus').textContent = 'Password berhasil diubah.';
+      if ($('oldPass')) $('oldPass').value = ''; if ($('newPass')) $('newPass').value = '';
+    }catch(err){ if ($('passStatus')) $('passStatus').textContent = 'Error: ' + (err?.message || err); }
+  }
+
+  async function changeEmail(){
+    if ($('emailStatus')) $('emailStatus').textContent = 'Menyimpan perubahan email...';
+    try{
+      await apiCall('changeMyEmail', { newEmail: ($('newEmail')?.value || '').trim() });
+      if ($('emailStatus')) $('emailStatus').textContent = 'Email berhasil diperbarui.';
+      if ($('newEmail')) $('newEmail').value = '';
+      toast('Email berhasil diperbarui');
+    }catch(err){
+      if ($('emailStatus')) $('emailStatus').textContent = 'Error: ' + (err?.message || err);
+      modalShow({ title:'Gagal', body: escapeHtml(err?.message || err) });
+    }
+  }
+
+  async function adminRefreshNotificationsQuick(){
+    const box = $('adminQuickInbox'); if (!box) return; box.innerHTML = 'Memuat...';
+    try{
+      const res = await apiCall('adminListNotifications');
+      const rows = Array.isArray(res) ? res : (res?.list || []);
+      if (!rows.length){ box.innerHTML = '<span class="miniMuted">Belum ada notifikasi.</span>'; return; }
+      box.innerHTML = rows.slice(0,3).map(x=>`<div style="margin-bottom:8px;"><span class="pill">${String(x.isRead||'no') !== 'yes' ? 'Baru' : 'Dibaca'}</span><div style="margin-top:6px; font-weight:700;">${escapeHtml(x.title||'')}</div><div class="miniMuted">${escapeHtml(x.message||'')}</div></div>`).join('');
+    }catch(err){ box.innerHTML = `<span class="miniMuted">Error: ${escapeHtml(err?.message || err)}</span>`; }
+  }
+
+  async function adminRefreshOnlineUsers(){
+    const status = $('adminOnlineStatus'), box = $('adminOnlineUsersTable'), sum = $('adminOnlineSummary');
+    if (status) status.textContent='Memuat user online...'; if (sum) sum.innerHTML='Memuat...';
+    try{
+      const res = await apiCall('adminListOnlineUsers');
+      const rows = Array.isArray(res) ? res : (res?.list || []);
+      if (status) status.textContent = `Total user online: ${rows.length}`;
+      if (sum) sum.innerHTML = !rows.length ? '<span class="miniMuted">Tidak ada user online.</span>' : rows.slice(0,5).map(x=>`<div style="margin-bottom:8px;"><span class="pill">${escapeHtml(x.role||'')}</span><div style="margin-top:6px; font-weight:700;">${escapeHtml(x.nama||'')}</div><div class="miniMuted">${escapeHtml(x.nip||'')} • ${escapeHtml(x.lastSeen||'')}</div></div>`).join('');
+      if (!box) return;
+      box.innerHTML = !rows.length ? '<div class="hint">Tidak ada user online.</div>' : '<table><tr><th>NIP</th><th>Nama</th><th>Role</th><th>Last Seen</th></tr>' + rows.map(x=>`<tr><td>${escapeHtml(x.nip||'')}</td><td>${escapeHtml(x.nama||'')}</td><td>${escapeHtml(x.role||'')}</td><td>${escapeHtml(x.lastSeen||'')}</td></tr>`).join('') + '</table>';
+    }catch(err){ if (status) status.textContent='Error: ' + (err?.message || err); if (sum) sum.innerHTML=`<span class="miniMuted">Error: ${escapeHtml(err?.message || err)}</span>`; if (box) box.innerHTML=''; }
+  }
+
+  async function adminRefreshNotifications(){
+    const status = $('adminNotifStatus'); if (status) status.textContent='Memuat inbox admin...';
+    try{
+      const res = await apiCall('adminListNotifications');
+      const rows = Array.isArray(res) ? res : (res?.list || []);
+      if (status) status.textContent = `Total notifikasi: ${rows.length}`;
+      renderAdminNotifications(rows);
+    }catch(err){ if (status) status.textContent = 'Error: ' + (err?.message || err); }
+  }
+  function renderAdminNotifications(list){
+    const box = $('adminNotifTable'); if (!box) return;
+    if (!list?.length){ box.innerHTML = '<div class="hint">Belum ada notifikasi masuk.</div>'; return; }
+    box.innerHTML = '<table><tr><th>Waktu</th><th>Judul</th><th>Pesan</th><th>Status</th><th>Link</th><th>Aksi</th></tr>' + list.map(x=>`<tr><td>${escapeHtml(x.timestamp||'')}</td><td>${escapeHtml(x.title||'')}</td><td style="white-space:pre-wrap;">${escapeHtml(x.message||'')}</td><td>${escapeHtml((x.isRead||'no') === 'yes' ? 'Dibaca' : 'Baru')}</td><td>${x.refId ? `<a href="${x.refId}" target="_blank" rel="noopener">Buka</a>` : '-'}</td><td><button type="button" class="secondary" style="margin-top:0; padding:6px 10px;" onclick="adminMarkNotificationRead('${String(x.notifId || '').replace(/'/g, "\\'")}')">Tandai Dibaca</button></td></tr>`).join('') + '</table>';
+  }
+  async function adminMarkNotificationRead(notifId){
+    try{ await apiCall('adminMarkNotificationRead', { notifId }); toast('Notifikasi ditandai sudah dibaca'); adminRefreshNotifications(); adminRefreshNotificationsQuick(); }
+    catch(err){ modalShow({ title:'Gagal', body: escapeHtml(err?.message || err) }); }
+  }
+  function adminClearNotifications(){
+    modalShow({ title:'Konfirmasi', body:'Hapus semua notifikasi inbox admin?', actions:[ { label:'Batal', kind:'secondary' }, { label:'Hapus Semua', kind:'danger', onClick: async ()=>{ toast('Menghapus notifikasi...'); try{ await apiCall('adminClearNotifications'); toast('Inbox admin berhasil dibersihkan'); adminRefreshNotifications(); adminRefreshNotificationsQuick(); }catch(err){ modalShow({ title:'Gagal', body: escapeHtml(err?.message || err) }); } } } ] });
+  }
+
+  async function adminLoadUsers(){
+    if ($('adminStatus')) $('adminStatus').textContent = 'Memuat daftar pengguna...';
+    try{
+      const res = await apiCall('adminListUsers');
+      const rows = Array.isArray(res) ? res : (res?.list || []);
+      if ($('adminStatus')) $('adminStatus').textContent = `Total user: ${rows.length}`;
+      renderAdminUsers(rows);
+    }catch(err){ if ($('adminStatus')) $('adminStatus').textContent = 'Error: ' + (err?.message || err); }
+  }
+  function renderAdminUsers(list){
+    const box = $('adminUsersTable'); if (!box) return;
+    if (!list?.length){ box.innerHTML = '<div class="hint">Belum ada data pengguna.</div>'; return; }
+    box.innerHTML = '<table><tr><th>Username</th><th>NIP</th><th>Nama</th><th>Email</th><th>Role Saat Ini</th><th>Ubah Role</th><th>Aksi</th></tr>' + list.map(u=>{
+      const rawUsername = String(u.username || ''), safeUsername = rawUsername.replace(/'/g, "\\'"), safeNip = String(u.nip || '').replace(/'/g, "\\'");
+      const currentRole = String(u.role || 'user').toLowerCase(), roleSelId = 'roleSel_' + rawUsername.replace(/[^a-zA-Z0-9_]/g, '_');
+      return `<tr><td>${escapeHtml(rawUsername)}</td><td>${escapeHtml(u.nip || '')}</td><td>${escapeHtml(u.nama || '')}</td><td>${escapeHtml(u.email || '')}</td><td>${escapeHtml(currentRole)}</td><td><div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;"><select id="${roleSelId}" style="min-width:140px;"><option value="user" ${currentRole==='user'?'selected':''}>user</option><option value="sekretaris" ${currentRole==='sekretaris'?'selected':''}>sekretaris</option><option value="admin" ${currentRole==='admin'?'selected':''}>admin</option></select><button type="button" class="secondary" style="margin-top:0; padding:6px 10px;" onclick="adminChangeRoleFromList('${safeUsername}')">Simpan Role</button></div></td><td><button type="button" class="secondary" style="margin-top:0; padding:6px 10px;" onclick="adminResetPassFromList('${safeUsername}')">Reset</button> <button type="button" class="danger" style="margin-top:0; padding:6px 10px;" onclick="adminDeleteUserFromList('${safeNip}')">Hapus</button></td></tr>`;
+    }).join('') + '</table>';
+  }
+  async function adminChangeRoleFromList(username){
+    const elId = 'roleSel_' + String(username || '').replace(/[^a-zA-Z0-9_]/g, '_'); const role = document.getElementById(elId)?.value || 'user';
+    toast('Menyimpan role...');
+    try{ await apiCall('adminUpdateUserRole', { username, role }); toast('Role berhasil diperbarui'); adminLoadUsers(); }
+    catch(err){ modalShow({ title:'Gagal ubah role', body: escapeHtml(err?.message || err) }); }
+  }
+
+  async function adminCreateUser(){
+    const nama = ($('newUserNama')?.value || '').trim(), username = ($('newUserUsername')?.value || '').trim(), nip = ($('newUserNip')?.value || '').trim(), email = ($('newUserEmail')?.value || '').trim(), password = $('newUserPass')?.value || '', role = $('newUserRole')?.value || 'user';
+    toast('Membuat user...');
+    try{
+      await apiCall('adminCreateUser', { nama, username, nip, email, password, role });
+      toast('User berhasil dibuat');
+      ['newUserNama','newUserUsername','newUserNip','newUserEmail','newUserPass'].forEach(id=>{ if ($(id)) $(id).value=''; });
+      adminLoadUsers();
+    }catch(err){ modalShow({ title:'Error', body: escapeHtml(err?.message || err) }); }
+  }
+  function adminResetPassFromList(username){
+    modalShow({ title:'Reset Password', body:`<div class="hint">Reset password untuk username: <b>${escapeHtml(username)}</b></div><label for="rpNewPass">Password Baru</label><input id="rpNewPass" type="password" placeholder="Masukkan password baru">`, actions:[ { label:'Batal', kind:'secondary' }, { label:'Reset', onClick: async ()=>{ const pass = $('rpNewPass')?.value || ''; toast('Mereset password...'); try{ await apiCall('adminResetPassword', { username, newPassword: pass }); toast('Password berhasil direset'); adminLoadUsers(); }catch(err){ modalShow({ title:'Error', body: escapeHtml(err?.message || err) }); } } } ] });
+  }
+  function adminDeleteUserFromList(nipOrUsername){
+    modalShow({ title:'Konfirmasi', body:`Hapus user <b>${escapeHtml(nipOrUsername)}</b>?`, actions:[ { label:'Batal', kind:'secondary' }, { label:'Hapus', kind:'danger', onClick: async ()=>{ toast('Menghapus user...'); try{ await apiCall('adminDeleteUser', { nip: nipOrUsername }); toast('User berhasil dihapus'); adminLoadUsers(); }catch(err){ modalShow({ title:'Error', body: escapeHtml(err?.message || err) }); } } } ] });
+  }
+
+  async function adminRefreshUploadRoot(){
+    const hint = $('uploadRootHint'); if (hint) hint.textContent = 'Memuat root folder...';
+    try{
+      const res = await apiCall('adminGetUploadRoot');
+      if ($('uploadRootId')) $('uploadRootId').value = res?.folderId || '';
+      if (hint) hint.innerHTML = res?.url ? `Root aktif: <a href="${res.url}" target="_blank" rel="noopener">${res.url}</a>` : '';
+    }catch(err){ if (hint) hint.textContent = 'Error: ' + (err?.message || err); }
+  }
+  async function adminSaveUploadRoot(){
+    const id = ($('uploadRootId')?.value || '').trim();
+    if (!id){ toast('Isi Folder ID terlebih dahulu'); return; }
+    toast('Menyimpan root folder...');
+    try{ await apiCall('adminSetUploadRootFolder', { urlOrId: id }); toast('Root folder berhasil disimpan'); adminRefreshUploadRoot(); adminRefreshUploadFolders(); refreshUploadFolders(); }
+    catch(err){ modalShow({ title:'Gagal', body: escapeHtml(err?.message || err) }); }
+  }
+  async function adminCreateUploadFolder(){
+    const name = ($('newUploadFolderName')?.value || '').trim();
+    if (!name){ toast('Isi nama folder terlebih dahulu'); return; }
+    toast('Membuat folder...');
+    try{ await apiCall('adminCreateUploadFolder', { name }); toast('Folder upload berhasil dibuat'); if ($('newUploadFolderName')) $('newUploadFolderName').value = ''; adminRefreshUploadFolders(); refreshUploadFolders(); }
+    catch(err){ modalShow({ title:'Gagal buat folder', body: escapeHtml(err?.message || err) }); }
+  }
+  async function adminRefreshUploadFolders(){
+    const status = $('adminUploadStatus'); if (status) status.textContent='Memuat daftar folder upload...';
+    try{
+      const res = await apiCall('adminListUploadFolders');
+      const rows = Array.isArray(res) ? res : (res?.list || []);
+      if (status) status.textContent = `Total folder: ${rows.length}`;
+      renderAdminUploadFolders(rows); refreshUploadFolders();
+    }catch(err){ if (status) status.textContent = 'Error: ' + (err?.message || err); }
+  }
+  function renderAdminUploadFolders(list){
+    const box = $('adminUploadFoldersTable'); if (!box) return;
+    if (!list?.length){ box.innerHTML = '<div class="hint">Belum ada folder upload.</div>'; return; }
+    box.innerHTML = '<table><tr><th>Nama Folder</th><th>Folder ID</th><th>Dibuat</th><th>Link</th><th>Aksi</th></tr>' + list.map(x=>`<tr><td>${escapeHtml(x.name||'')}</td><td>${escapeHtml(x.folderId||'')}</td><td>${escapeHtml(x.created||'')}</td><td><a href="${x.url}" target="_blank" rel="noopener">Buka Folder</a></td><td><button type="button" class="danger" style="margin-top:0; padding:6px 10px;" onclick="adminDeleteUploadFolder('${String(x.folderId || '').replace(/'/g, "\\'")}')">Hapus</button></td></tr>`).join('') + '</table>';
+  }
+  function adminDeleteUploadFolder(folderId){
+    modalShow({ title:'Konfirmasi', body:`Folder upload ini akan dipindahkan ke Trash Google Drive.<br><br><b>${escapeHtml(folderId)}</b>`, actions:[ { label:'Batal', kind:'secondary' }, { label:'Hapus', kind:'danger', onClick: async ()=>{ toast('Menghapus folder...'); try{ await apiCall('adminDeleteUploadFolder', { folderId }); toast('Folder berhasil dihapus'); adminRefreshUploadFolders(); refreshUploadFolders(); }catch(err){ modalShow({ title:'Gagal', body: escapeHtml(err?.message || err) }); } } } ] });
+  }
+
+  async function adminRefreshLogs(){
+    const status = $('adminLogsStatus'); if (status) status.textContent='Memuat log aktivitas...';
+    try{
+      const res = await apiCall('adminListLogs', { limit: 500 });
+      const rows = Array.isArray(res) ? res : (res?.list || []);
+      if (status) status.textContent = `Total log tampil: ${rows.length}`;
+      renderAdminLogs(rows);
+    }catch(err){ if (status) status.textContent = 'Error: ' + (err?.message || err); }
+  }
+  function renderAdminLogs(list){
+    const box = $('adminLogsTable'); if (!box) return;
+    if (!list?.length){ box.innerHTML = '<div class="hint">Belum ada log aktivitas.</div>'; return; }
+    box.innerHTML = '<table><tr><th>Waktu</th><th>User</th><th>Role</th><th>Aksi</th><th>Detail</th><th>Hapus</th></tr>' + list.map(x=>`<tr><td>${escapeHtml(x.time||'')}</td><td>${escapeHtml((x.nama||'') + ' (' + (x.nip||'') + ')')}</td><td>${escapeHtml(x.role||'')}</td><td>${escapeHtml(x.action||'')}</td><td style="max-width:420px; white-space:pre-wrap;">${escapeHtml(x.detail||'')}</td><td><button type="button" class="danger" style="margin-top:0; padding:6px 10px;" onclick="adminDeleteLog(${Number(x.rowNum || 0)})">Hapus</button></td></tr>`).join('') + '</table>';
+  }
+  async function adminDeleteLog(logRowNum){
+    try{ await apiCall('adminDeleteLogs', { rowNums:[Number(logRowNum)] }); toast('Log berhasil dihapus'); adminRefreshLogs(); }
+    catch(err){ modalShow({ title:'Gagal', body: escapeHtml(err?.message || err) }); }
+  }
+  function adminClearLogs(){
+    modalShow({ title:'Konfirmasi', body:'Hapus semua log aktivitas?', actions:[ { label:'Batal', kind:'secondary' }, { label:'Hapus Semua', kind:'danger', onClick: async ()=>{ toast('Menghapus semua log...'); try{ await apiCall('adminClearLogs', {}); toast('Semua log berhasil dihapus'); adminRefreshLogs(); }catch(err){ modalShow({ title:'Gagal', body: escapeHtml(err?.message || err) }); } } } ] });
+  }
+
+  function toast(msg, ms=2200){
+    const el = $('toast');
+    if (!el){ alert(msg || ''); return; }
+    el.textContent = msg || ''; el.classList.remove('hidden');
+    clearTimeout(window.__toastT); window.__toastT = setTimeout(()=> el.classList.add('hidden'), ms);
+  }
+
+  function modalShow({ title='Informasi', body='', actions=[] }){
+    const m = $('modal'), card = $('modalCard');
+    if (!m || !card){ alert(title + '\n\n' + String(body || '').replace(/<[^>]*>/g,'')); return; }
+    if ($('modalTitle')) $('modalTitle').textContent = title;
+    if ($('modalBody')) $('modalBody').innerHTML = body;
+    const act = $('modalActions'); if (act) act.innerHTML = '';
+    actions.forEach(a=>{ const btn = document.createElement('button'); btn.type='button'; btn.textContent=a.label; btn.className = a.kind === 'secondary' ? 'secondary' : (a.kind === 'danger' ? 'danger' : ''); btn.onclick = ()=>{ modalHide(); if (typeof a.onClick === 'function') a.onClick(); }; act.appendChild(btn); });
+    if (!actions.length){ const btn = document.createElement('button'); btn.type='button'; btn.textContent='Tutup'; btn.className='secondary'; btn.onclick = modalHide; act.appendChild(btn); }
+    m.classList.remove('hidden'); m.style.display='flex';
+    $('modalCloseBtn').onclick = modalHide;
+    m.onclick = (ev)=>{ if (ev.target === m) modalHide(); };
+    card.onclick = (ev)=> ev.stopPropagation();
+  }
+  function modalHide(){
+    const m = $('modal'); if (!m) return;
+    m.classList.add('hidden'); m.style.display='none'; m.onclick=null;
+    if ($('modalCard')) $('modalCard').onclick = null;
+    if ($('modalCloseBtn')) $('modalCloseBtn').onclick = null;
+  }
+
+  async function refreshDrafts(){
+    const sel = $('draftSelect'); if (!sel) return; sel.innerHTML = '';
+    try{
+      const res = await apiCall('listLhkDrafts');
+      const rows = Array.isArray(res) ? res : (res?.list || []);
+      if (!rows.length){ const o=document.createElement('option'); o.value=''; o.textContent='(Belum ada draft)'; sel.appendChild(o); return; }
+      rows.forEach(d=>{ const o=document.createElement('option'); o.value=d.fileId; o.textContent=`${d.name} — ${d.created}`; sel.appendChild(o); });
+    }catch(err){ modalShow({ title:'Error', body: escapeHtml(err?.message || err) }); }
+  }
+
+  async function saveDraft(){
+    toast('Menyimpan draft...');
+    try{ await apiCall('saveLhkDraft', getFormData()); toast('Draft berhasil disimpan'); refreshDrafts(); }
+    catch(err){ modalShow({ title:'Gagal simpan draft', body: escapeHtml(err?.message || err) }); }
+  }
+  async function loadDraft(){
+    const id = $('draftSelect')?.value || '';
+    if (!id){ modalShow({ title:'Informasi', body:'Pilih draft terlebih dahulu.' }); return; }
+    toast('Memuat draft...');
+    try{ const res = await apiCall('loadLhkDraft', { fileId:id }); applyDraftToForm(res?.draft || {}); updateHolidayPlaceholder(false); toast('Draft berhasil dimuat'); }
+    catch(err){ modalShow({ title:'Gagal muat draft', body: escapeHtml(err?.message || err) }); }
+  }
+  function deleteDraft(){
+    const id = $('draftSelect')?.value || '';
+    if (!id){ modalShow({ title:'Informasi', body:'Pilih draft terlebih dahulu.' }); return; }
+    modalShow({ title:'Konfirmasi', body:'Hapus draft terpilih?', actions:[ { label:'Batal', kind:'secondary' }, { label:'Hapus', kind:'danger', onClick: async ()=>{ try{ await apiCall('deleteLhkDraft', { fileId:id }); toast('Draft berhasil dihapus'); refreshDrafts(); }catch(err){ modalShow({ title:'Gagal hapus draft', body: escapeHtml(err?.message || err) }); } } } ] });
+  }
+
+  function applyDraftToForm(d){
+    const setVal = (id, val)=>{ if ($(id)) $(id).value = val ?? ''; };
+    ['subBagian','jabatan','jabatanPembuat','month','year','kota','holidays','fontOut','fontIn','jabatanAtasan','namaAtasan','nipAtasan','colorHeader','colorDateCol','colorOffRow','enableOffHighlight','showSubHead','showKet','hideSaturday','hideSunday','signatureMode','pdfMode'].forEach(id=>setVal(id, d[id] ?? $(id)?.value ?? ''));
+    setVal('month', String(d.month || '')); setVal('year', String(d.year || '')); setVal('fontOut', String(d.fontOut || '12')); setVal('fontIn', String(d.fontIn || '12'));
+    setVal('colorHeader', d.colorHeader || '#dbeafe'); setVal('colorDateCol', d.colorDateCol || '#f3f4f6'); setVal('colorOffRow', d.colorOffRow || '#fef3c7');
+    sigPembuatB64 = d.sigPembuatB64 || ''; sigAtasanB64 = d.sigAtasanB64 || ''; currentDays = Array.isArray(d.days) ? d.days : [];
+    window.__lastPeriodMonth = Number(d.month || 0); window.__lastPeriodYear = Number(d.year || 0);
+    bindColorPreview('colorHeader', 'previewColorHeader'); bindColorPreview('colorDateCol', 'previewColorDateCol'); bindColorPreview('colorOffRow', 'previewColorOffRow');
+    syncAtasanNip(); applySignatureModeUI(); updateHolidayPlaceholder(false);
+  }
+
+  function openRegister(){
+    modalShow({ title:'Daftar Akun Baru', body:`<div class="hint" style="margin-bottom:10px">Akun yang didaftarkan dari sini otomatis memiliki role <b>user</b>.</div><label for="regNama">Nama</label><input id="regNama" placeholder="Masukkan nama lengkap"><label for="regUsername">Username</label><input id="regUsername" placeholder="Masukkan username login"><label for="regNip">NIP</label><input id="regNip" placeholder="Masukkan NIP"><label for="regEmail">Email</label><input id="regEmail" type="email" placeholder="user@domain.com"><label for="regPass">Password</label><input id="regPass" type="password" placeholder="Masukkan password">`, actions:[ { label:'Batal', kind:'secondary' }, { label:'Daftar', onClick: async ()=>{ const nama=($('regNama')?.value||'').trim(), username=($('regUsername')?.value||'').trim(), nip=($('regNip')?.value||'').trim(), email=($('regEmail')?.value||'').trim(), password=$('regPass')?.value||''; toast('Mendaftarkan akun...'); try{ await apiCall('registerUser', { nama, username, nip, email, password }, ''); toast('Pendaftaran berhasil. Silakan login.'); }catch(err){ modalShow({ title:'Pendaftaran gagal', body: escapeHtml(err?.message || err) }); } } } ] });
+  }
+
+  function openForgot(){
+    bumpAuthNonce(); toast('Membuka reset password...');
+    stopHeartbeat(); if (window.__syncTimer) { clearInterval(window.__syncTimer); window.__syncTimer = null; }
+    token=''; sessionUser=null; currentDays=[]; saveTokenLocal('');
+    try { $('loginPass').value = ''; } catch(e){}
+    showLogin();
+    modalShow({ title:'Lupa Password', body:`<div class="hint" style="margin-bottom:10px">Masukkan NIP. Kode reset akan dikirim ke email yang terdaftar.</div><label for="fpNip">NIP</label><input id="fpNip" value=""><label for="fpCode">Kode Reset (6 digit)</label><input id="fpCode" placeholder="Contoh: 123456"><label for="fpNewPass">Password Baru</label><input id="fpNewPass" type="password"><div class="hint">Klik "Kirim Kode", lalu isi kode dan password baru, kemudian klik "Reset".</div>`, actions:[ { label:'Tutup', kind:'secondary' }, { label:'Kirim Kode', kind:'secondary', onClick: async ()=>{ const n = ($('fpNip')?.value || '').trim(); toast('Mengirim kode reset...'); try{ const res = await apiCall('requestPasswordReset', { nip:n }, ''); modalShow({ title:'Informasi', body: escapeHtml(res?.message || 'Jika terdaftar, kode akan dikirim.') }); }catch(err){ modalShow({ title:'Gagal kirim kode', body: escapeHtml(err?.message || err) }); } } }, { label:'Reset', onClick: async ()=>{ const n = ($('fpNip')?.value || '').trim(), c = ($('fpCode')?.value || '').trim(), p = $('fpNewPass')?.value || ''; toast('Mereset password...'); try{ await apiCall('resetPasswordWithCode', { nip:n, code:c, newPassword:p }, ''); modalShow({ title:'Sukses', body:'Password berhasil direset. Silakan login kembali.' }); }catch(err){ modalShow({ title:'Gagal reset', body: escapeHtml(err?.message || err) }); } } } ] });
+  }
+
+  function applySignatureModeUI(){
+    const mode = $('signatureMode')?.value || 'text'; const row = $('sigUploadRow'); if (!row) return;
+    if (mode === 'image') row.classList.remove('hidden');
+    else { row.classList.add('hidden'); sigPembuatB64=''; sigAtasanB64=''; if ($('sigPembuatFile')) $('sigPembuatFile').value=''; if ($('sigAtasanFile')) $('sigAtasanFile').value=''; }
+  }
+
+  function escapeHtml(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c])); }
+  function finishBoot(){ document.body.classList.remove('booting'); }
+
+  async function printPreview(){
+    resetCurrentDaysIfPeriodChanged(); setStatus('Menyiapkan tampilan print...');
+    const form = getFormData(); form.exportMode = true;
+    try{
+      const res = await apiCall('renderPreviewHtml', form);
+      const cleanHtml = (res && typeof res === 'object' && 'html' in res) ? res.html : res;
+      const w = window.open('', '_blank');
+      if (!w){ modalShow({ title:'Print tidak tersedia', body:'Popup diblokir browser. Izinkan popup lalu coba lagi.' }); return; }
+      w.document.open(); w.document.write(cleanHtml); w.document.close();
+      w.onload = () => { w.focus(); w.print(); };
+      setStatus('Tampilan print siap.');
+    }catch(err){ setStatus('Error: ' + (err?.message || err)); }
+  }
+
+  window.addEventListener('load', ()=>{
+    bindLoginEnterBehavior();
+    $('loginView')?.classList.add('hidden'); $('appView')?.classList.add('hidden');
+
+    $('btnLogin')?.addEventListener('click', e=>{ e.preventDefault(); doLogin(); });
+    $('btnForgot')?.addEventListener('click', e=>{ e.preventDefault(); openForgot(); });
+    $('btnRegister')?.addEventListener('click', e=>{ e.preventDefault(); openRegister(); });
+    document.querySelectorAll('.tab[data-tab]').forEach(el=> el.addEventListener('click', ()=> showTab(el.getAttribute('data-tab'))));
+
+    $('btnPreviewMobile')?.addEventListener('click', generatePreview);
+    $('btnDownloadMobile')?.addEventListener('click', downloadPdf);
+    $('btnPrint')?.addEventListener('click', printPreview);
+
+    $('btnLogout')?.addEventListener('click', doLogout);
+    $('btnPreview')?.addEventListener('click', generatePreview);
+    $('btnDownload')?.addEventListener('click', downloadPdf);
+    $('btnDownloadExcel')?.addEventListener('click', downloadExcel);
+
+    $('btnRefreshDrafts')?.addEventListener('click', refreshDrafts);
+    $('btnSaveDraft')?.addEventListener('click', saveDraft);
+    $('btnLoadDraft')?.addEventListener('click', loadDraft);
+    $('btnDeleteDraft')?.addEventListener('click', deleteDraft);
+
+    $('btnRefreshFiles')?.addEventListener('click', refreshFiles);
+    $('btnOpenFolder')?.addEventListener('click', openFolder);
+
+    $('btnUploadLhk')?.addEventListener('click', uploadLhk);
+    $('btnChangePass')?.addEventListener('click', changePassword);
+    $('btnChangeEmail')?.addEventListener('click', changeEmail);
+
+    $('btnAdminRefreshNotifications')?.addEventListener('click', ()=>{ adminRefreshNotifications(); adminRefreshNotificationsQuick(); });
+    $('btnAdminClearNotifications')?.addEventListener('click', adminClearNotifications);
+    $('btnAdminRefreshOnlineUsers')?.addEventListener('click', adminRefreshOnlineUsers);
+    $('btnAdminLoadUsers')?.addEventListener('click', adminLoadUsers);
+    $('btnAdminCreateUser')?.addEventListener('click', adminCreateUser);
+
+    $('btnAdminSaveUploadRoot')?.addEventListener('click', adminSaveUploadRoot);
+    $('btnAdminCreateUploadFolder')?.addEventListener('click', adminCreateUploadFolder);
+    $('btnAdminRefreshUploadFolders')?.addEventListener('click', adminRefreshUploadFolders);
+
+    $('btnAdminRefreshLogs')?.addEventListener('click', adminRefreshLogs);
+    $('btnAdminClearLogs')?.addEventListener('click', adminClearLogs);
+
+    document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape'){ const m = $('modal'); if (m && !m.classList.contains('hidden')) modalHide(); } });
+    bindColorPreview('colorHeader', 'previewColorHeader'); bindColorPreview('colorDateCol', 'previewColorDateCol'); bindColorPreview('colorOffRow', 'previewColorOffRow');
+    tryAutoLogin();
+  });
+</script>
+</body>
+</html>
