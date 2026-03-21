@@ -3,59 +3,59 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aplikasi Laporan Kinerja HarianK KPU Kabupaten Labuhanbatu Utara</title>
-  <meta name="theme-color" content="#0b1220" />
-  <meta name="description" content="Aplikasi Laporan Kinerja Harian versi PWA." />
+  <title>KPU Kabupaten Labuhanbatu Utara - Laporan Kinerja Harian</title>
+  <meta name="theme-color" content="#ed1c24" />
+  <meta name="description" content="Laporan Kinerja Harian KPU Kabupaten Labuhanbatu Utara versi PWA." />
   <link rel="manifest" href="/manifest.webmanifest" />
-  <link rel="icon" href="/icons/icon-192.png" />
+  <link rel="icon" href="/icon-192.png" />
 <style>
   :root{
-    --bg:#0b1220; --bg-soft:#111a2b; --card:#0f1a30; --card2:#101f3a; --card3:rgba(255,255,255,.03);
-    --text:#e8eefc; --text-soft:#cfdaf0; --muted:#9db0d1; --muted-2:#8ea0bf; --line:rgba(255,255,255,.08);
-    --line-strong:rgba(255,255,255,.14); --brand:#3b82f6; --brand2:#2563eb; --brand-soft:rgba(59,130,246,.18);
-    --danger:#dc4768; --danger-soft:rgba(220,71,104,.16); --success:#16a34a; --shadow:0 12px 34px rgba(0,0,0,.24);
-    --radius:18px; --radius-sm:14px; --radius-xs:12px;
+    --bg:#f5f5f5; --bg-soft:#ffffff; --card:#ffffff; --card2:#fff7f7; --card3:rgba(237,28,36,.04);
+    --text:#1f2937; --text-soft:#374151; --muted:#6b7280; --muted-2:#9ca3af; --line:rgba(31,41,55,.10);
+    --line-strong:rgba(31,41,55,.16); --brand:#ed1c24; --brand2:#c7141b; --brand-soft:rgba(237,28,36,.12);
+    --danger:#991b1b; --danger-soft:rgba(153,27,27,.10); --success:#15803d; --shadow:0 12px 30px rgba(0,0,0,.10);
+    --gold:#f4c542; --radius:18px; --radius-sm:14px; --radius-xs:12px;
   }
   *{ box-sizing:border-box; }
   html, body{ margin:0; width:100%; min-height:100%; }
   body{
     font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     background:
-      radial-gradient(1200px 600px at 20% 0%, rgba(59,130,246,.20), transparent 60%),
-      radial-gradient(900px 500px at 100% 30%, rgba(37,99,235,.14), transparent 55%),
-      linear-gradient(180deg, #09111d 0%, #0b1220 100%);
+      radial-gradient(1100px 560px at 0% 0%, rgba(237,28,36,.16), transparent 60%),
+      radial-gradient(900px 500px at 100% 10%, rgba(244,197,66,.18), transparent 55%),
+      linear-gradient(180deg, #fffefe 0%, #f4f4f4 100%);
     color:var(--text); letter-spacing:.1px; line-height:1.55;
   }
   .container{ width:100%; max-width:1440px; margin:0 auto; padding:24px 28px 32px; }
   .card{ background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025)); border:1px solid var(--line); border-radius:var(--radius); padding:20px; margin-bottom:18px; box-shadow:var(--shadow); backdrop-filter:blur(8px); }
   h1,h2,h3,h4{ margin:0; color:var(--text); line-height:1.35; }
   h3{ font-size:21px; font-weight:800; letter-spacing:.2px; }
-  h4{ font-size:15px; font-weight:800; color:var(--text-soft); }
+  h4{ font-size:15px; font-weight:800; color:var(--text); }
   .pageSub{ font-size:13px; color:var(--muted); margin-top:6px; line-height:1.7; }
   .hint{ font-size:12px; color:var(--muted); margin-top:8px; line-height:1.7; }
-  label{ display:block; font-size:12px; color:#c6d4eb; margin-top:12px; margin-bottom:7px; font-weight:700; letter-spacing:.2px; }
+  label{ display:block; font-size:12px; color:#374151; margin-top:12px; margin-bottom:7px; font-weight:700; letter-spacing:.2px; }
   input, select, textarea{
     width:100%; padding:12px 14px; border:1px solid var(--line-strong); border-radius:13px;
-    background:rgba(6,13,25,.42); color:var(--text); outline:none; font-size:14px; line-height:1.45;
+    background:#ffffff; color:var(--text); outline:none; font-size:14px; line-height:1.45;
     transition:border-color .18s ease, box-shadow .18s ease, background .18s ease;
   }
-  input::placeholder, textarea::placeholder{ color:#8ea0bf; }
-  input:focus, select:focus, textarea:focus{ border-color:rgba(59,130,246,.58); box-shadow:0 0 0 4px rgba(59,130,246,.12); background:rgba(8,18,35,.60); }
+  input::placeholder, textarea::placeholder{ color:#9ca3af; }
+  input:focus, select:focus, textarea:focus{ border-color:rgba(237,28,36,.55); box-shadow:0 0 0 4px rgba(237,28,36,.10); background:#fffdfd; }
   input:disabled{ opacity:.88; cursor:not-allowed; }
   textarea{ min-height:78px; resize:vertical; }
-  select{ background:rgba(6,13,25,.42)!important; color:var(--text)!important; border:1px solid var(--line-strong)!important; appearance:none; }
-  select option{ background:#0f1a30!important; color:var(--text)!important; }
+  select{ background:#ffffff!important; color:var(--text)!important; border:1px solid var(--line-strong)!important; appearance:none; }
+  select option{ background:#ffffff!important; color:var(--text)!important; }
   .row{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
   .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-top:16px; background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:18px; padding:8px; }
   .tab{ background:transparent; border:1px solid transparent; border-radius:999px; padding:11px 16px; cursor:pointer; user-select:none; color:var(--muted); font-size:13px; font-weight:800; transition:all .18s ease; }
   .tab:hover{ color:var(--text); background:rgba(255,255,255,.04); }
-  .tab.active{ background:var(--brand-soft); color:var(--text); border-color:rgba(59,130,246,.35); box-shadow:inset 0 0 0 1px rgba(255,255,255,.03); }
-  button{ margin-top:12px; padding:11px 14px; border:1px solid rgba(59,130,246,.30); border-radius:12px; cursor:pointer; background:linear-gradient(180deg,#3b82f6,#2563eb); color:#fff; font-size:13px; font-weight:800; letter-spacing:.15px; transition:transform .15s ease, box-shadow .18s ease, opacity .18s ease, background .18s ease; box-shadow:0 8px 18px rgba(37,99,235,.24);}
+  .tab.active{ background:var(--brand); color:#fff; border-color:rgba(237,28,36,.45); box-shadow:inset 0 0 0 1px rgba(255,255,255,.08); }
+  button{ margin-top:12px; padding:11px 14px; border:1px solid rgba(237,28,36,.28); border-radius:12px; cursor:pointer; background:linear-gradient(180deg,#ed1c24,#c7141b); color:#fff; font-size:13px; font-weight:800; letter-spacing:.15px; transition:transform .15s ease, box-shadow .18s ease, opacity .18s ease, background .18s ease; box-shadow:0 8px 18px rgba(237,28,36,.22);}
   button:hover{ transform:translateY(-1px); } button:active{ transform:translateY(0); }
-  button.secondary{ background:rgba(255,255,255,.08); color:var(--text); border-color:rgba(255,255,255,.12); box-shadow:none; }
-  button.secondary:hover{ background:rgba(255,255,255,.12); }
-  button.danger{ background:var(--danger-soft); border-color:rgba(220,71,104,.32); color:#ffdbe3; box-shadow:none; }
-  button.danger:hover{ background:rgba(220,71,104,.22); }
+  button.secondary{ background:#ffffff; color:var(--brand); border-color:rgba(237,28,36,.24); box-shadow:none; }
+  button.secondary:hover{ background:#fff6f6; }
+  button.danger{ background:var(--danger-soft); border-color:rgba(153,27,27,.22); color:#991b1b; box-shadow:none; }
+  button.danger:hover{ background:rgba(153,27,27,.14); }
   .hidden{ display:none!important; }
   .previewBox{ background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; margin-top:12px; }
   iframe{ width:100%; height:80vh; border:0; background:#fff; border-radius:12px; }
@@ -63,7 +63,7 @@
   th, td{ border:1px solid rgba(255,255,255,.08); padding:11px 12px; font-size:12px; vertical-align:top; line-height:1.6; }
   th{ color:var(--text); background:rgba(255,255,255,.05); text-align:left; font-weight:800; }
   td{ color:var(--text-soft); background:rgba(255,255,255,.015); }
-  .toolbarCard{ position:sticky; top:10px; z-index:5; background:linear-gradient(180deg, rgba(15,26,48,.98), rgba(15,26,48,.92)); border:1px solid var(--line); border-radius:16px; padding:15px; margin-bottom:15px; backdrop-filter:blur(12px); box-shadow:var(--shadow); }
+  .toolbarCard{ position:sticky; top:10px; z-index:5; background:linear-gradient(180deg, #fffefe, #fff7f7); border:1px solid var(--line); border-radius:16px; padding:15px; margin-bottom:15px; backdrop-filter:blur(12px); box-shadow:var(--shadow); }
   .toolbarRow{ display:flex; gap:12px; flex-wrap:wrap; align-items:end; }
   .toolbarRow > div{ flex:1 1 220px; }
   .toolbarRow .btnWrap{ flex:1 1 340px; display:flex; gap:10px; align-items:end; flex-wrap:wrap; }
@@ -82,14 +82,14 @@
   .miniCard{ background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.07); border-radius:15px; padding:15px; margin-top:16px; }
   .actionRow{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
   .actionRow button{ margin-top:0; }
-  .toast{ position:fixed; left:50%; bottom:18px; transform:translateX(-50%); background:rgba(6,13,25,.92); border:1px solid var(--line); color:var(--text); padding:11px 14px; border-radius:999px; font-size:13px; z-index:1000; max-width:min(560px, calc(100% - 24px)); text-align:center; box-shadow:var(--shadow); }
+  .toast{ position:fixed; left:50%; bottom:18px; transform:translateX(-50%); background:#1f2937; border:1px solid rgba(255,255,255,.12); color:#fff; padding:11px 14px; border-radius:999px; font-size:13px; z-index:1000; max-width:min(560px, calc(100% - 24px)); text-align:center; box-shadow:var(--shadow); }
   .modal{ position:fixed; inset:0; background:rgba(0,0,0,.60); display:flex; align-items:center; justify-content:center; z-index:1001; padding:18px; pointer-events:auto; }
-  .modal-card{ width:min(700px,100%); background:linear-gradient(180deg, rgba(16,31,58,.98), rgba(15,26,48,.98)); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:0 18px 40px rgba(0,0,0,.35); }
+  .modal-card{ width:min(700px,100%); background:linear-gradient(180deg, #ffffff, #fff7f7); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:0 18px 40px rgba(0,0,0,.18); }
   .modal-title{ font-weight:800; margin-bottom:8px; font-size:16px; letter-spacing:.2px; }
   .modal-body{ color:var(--text-soft); font-size:13px; line-height:1.7; }
   .modal-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:14px; flex-wrap:wrap; }
   .modal.hidden { display:none; } #modalCard { pointer-events:auto; }
-  a{ color:#7fb0ff; text-decoration:none; } a:hover{ color:#a6c7ff; text-decoration:underline; }
+  a{ color:var(--brand); text-decoration:none; } a:hover{ color:var(--brand2); text-decoration:underline; }
   .colorGrid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:14px; }
   .colorItem{ background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); border-radius:16px; padding:14px; }
   .colorPreview{ height:54px; border-radius:12px; border:1px solid rgba(255,255,255,.14); margin-bottom:10px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); }
@@ -101,11 +101,26 @@
   .panelIntro{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
   .panelIntro .meta{ display:flex; flex-direction:column; gap:3px; }
   .appName{ font-weight:900; font-size:19px; letter-spacing:.2px; }
+
+  .brandHeader{ display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+  .brandLogo{ width:72px; height:72px; object-fit:contain; border-radius:16px; background:#fff; padding:6px; box-shadow:0 8px 20px rgba(237,28,36,.14); border:1px solid rgba(237,28,36,.12); }
+  .brandEyebrow{ display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border-radius:999px; background:rgba(237,28,36,.08); color:var(--brand); font-size:12px; font-weight:800; letter-spacing:.3px; margin-bottom:8px; }
+  .brandEyebrow::before{ content:''; width:8px; height:8px; border-radius:999px; background:var(--gold); box-shadow:0 0 0 3px rgba(244,197,66,.18); }
+  .brandTitle{ font-size:22px; font-weight:900; line-height:1.25; }
+  .brandSub{ font-size:13px; color:var(--muted); line-height:1.7; margin-top:4px; }
+  .heroStripe{ height:10px; border-radius:999px; background:linear-gradient(90deg, #ed1c24 0 50%, #ffffff 50% 100%); border:1px solid rgba(31,41,55,.08); margin:14px 0 18px; overflow:hidden; }
+  .panelBadge{ display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:rgba(244,197,66,.16); color:#7a5a00; font-size:12px; font-weight:800; border:1px solid rgba(244,197,66,.45); }
+  .bootLogoWrap{ width:98px; height:98px; border-radius:24px; background:linear-gradient(180deg, #ffffff, #fff4f4); padding:10px; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; box-shadow:0 12px 28px rgba(237,28,36,.16); border:1px solid rgba(237,28,36,.14); }
+  .bootLogoWrap img{ width:100%; height:100%; object-fit:contain; }
+  .bootProgress{ position:relative; width:100%; height:10px; margin-top:16px; border-radius:999px; overflow:hidden; background:rgba(31,41,55,.08); }
+  .bootProgress::after{ content:''; position:absolute; inset:0; width:42%; background:linear-gradient(90deg, #ed1c24, #f4c542); border-radius:inherit; animation:loadingBar 1.35s ease-in-out infinite; }
+  @keyframes loadingBar{ 0%{ transform:translateX(-120%);} 100%{ transform:translateX(280%);} }
+
   .topQuickRow{ display:flex; gap:12px; flex-wrap:wrap; margin-top:14px; }
   .quickMiniCard{ flex:1 1 280px; background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:16px; padding:14px; }
   .quickMiniTitle{ font-size:13px; font-weight:800; color:var(--text); margin-bottom:6px; }
   .quickMiniSub{ font-size:12px; color:var(--muted); line-height:1.6; margin-bottom:10px; }
-  .pill{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:rgba(59,130,246,.15); border:1px solid rgba(59,130,246,.22); color:var(--text); font-size:12px; font-weight:700; }
+  .pill{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:rgba(237,28,36,.10); border:1px solid rgba(237,28,36,.18); color:var(--brand); font-size:12px; font-weight:700; }
   .miniMuted{ font-size:12px; color:var(--muted); }
   body.booting #loginView, body.booting #appView{ display:none!important; }
   #bootScreen{ display:none; }
@@ -131,12 +146,28 @@
 </style>
 </head>
 <body class="booting">
-  <div id="bootScreen"><div class="bootCard"><div class="bootTitle">Memulihkan sesi...</div><div class="bootSub">Mohon tunggu sebentar</div></div></div>
+  <div id="bootScreen">
+      <div class="bootCard">
+        <div class="bootLogoWrap"><img src="https://upload.wikimedia.org/wikipedia/commons/4/46/KPU_Logo.svg" alt="Logo KPU"></div>
+        <div class="bootTitle">KPU Kabupaten Labuhanbatu Utara</div>
+        <div class="bootSub">Laporan Kinerja Harian sedang dimuat...</div>
+        <div class="bootProgress" aria-hidden="true"></div>
+      </div>
+    </div>
   <div class="container">
     <div id="loginView" class="card hidden">
       <div class="authHeader">
+        <div class="brandHeader">
+          <img class="brandLogo" src="https://upload.wikimedia.org/wikipedia/commons/4/46/KPU_Logo.svg" alt="Logo KPU">
+          <div>
+            <div class="brandEyebrow">KOMISI PEMILIHAN UMUM</div>
+            <div class="brandTitle">KPU Kabupaten Labuhanbatu Utara</div>
+            <div class="brandSub">Aplikasi Laporan Kinerja Harian dengan nuansa resmi KPU.</div>
+          </div>
+        </div>
+        <div class="heroStripe"></div>
         <div class="authTitle">Masuk ke Sistem</div>
-        <div class="authSub">Kelola Laporan Kinerja Harian dengan tampilan yang lebih rapi, cepat, dan nyaman digunakan.</div>
+        <div class="authSub">Silakan login untuk mengelola LKH dengan tema KPU, identitas instansi, dan tampilan yang lebih resmi.</div>
       </div>
       <label for="loginUsername">Username</label>
       <input id="loginUsername" autocomplete="username" placeholder="Masukkan username">
@@ -154,10 +185,12 @@
       <div class="card">
         <div class="panelIntro">
           <div class="meta">
-            <div class="appName">Aplikasi Laporan Kinerja Harian</div>
+            <div class="brandEyebrow">KOMISI PEMILIHAN UMUM</div>
+            <div class="appName">KPU Kabupaten Labuhanbatu Utara</div>
+            <div class="pageSub">Laporan Kinerja Harian</div>
             <div class="pageSub" id="whoami"></div>
           </div>
-          <div><button class="secondary" type="button" id="btnLogout">Logout</button></div>
+          <div><span class="panelBadge">Tema Resmi KPU</span></div><div><button class="secondary" type="button" id="btnLogout">Logout</button></div>
         </div>
         <div class="tabs">
           <div class="tab active" id="tabLhk" data-tab="lhk">Penyusunan LKH</div>
