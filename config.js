@@ -1,1 +1,1 @@
-window.APP_CONFIG = { appName: 'Aplikasi LHK PWA' };
+window.APP_CONFIG = { appName: 'KPU Kabupaten Labuhanbatu Utara - LHK' };
