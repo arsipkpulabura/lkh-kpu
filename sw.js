@@ -1,5 +1,5 @@
-const CACHE = 'lhk-pwa-v1';
-const ASSETS = ['/', '/index.html', '/manifest.webmanifest', '/config.js', '/icons/icon-192.png', '/icons/icon-512.png'];
+const CACHE = 'lhk-pwa-kpu-v2';
+const ASSETS = ['/', '/index.html', '/manifest.webmanifest', '/config.js', '/icon-192.png', '/icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
 });
