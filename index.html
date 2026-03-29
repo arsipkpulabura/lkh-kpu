@@ -973,6 +973,195 @@
   --brand:#ef4444;
   --brand-strong:#dc2626;
 }
+  body.dark{
+  background:
+    radial-gradient(1100px 620px at -10% -10%, rgba(239,68,68,.16), transparent 55%),
+    radial-gradient(900px 540px at 110% 0%, rgba(244,197,66,.10), transparent 52%),
+    linear-gradient(180deg, #0b1220 0%, #111827 45%, #0f172a 100%);
+}
+
+body.dark .card,
+body.dark .sectionCard,
+body.dark .toolbarCard,
+body.dark .miniCard,
+body.dark .quickMiniCard,
+body.dark .colorItem,
+body.dark .previewBox,
+body.dark .modal-card,
+body.dark .bootCard{
+  background:linear-gradient(180deg, rgba(17,24,39,.96), rgba(15,23,42,.92));
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 18px 40px rgba(0,0,0,.35);
+  color:var(--text);
+}
+
+body.dark .card::before{
+  background:linear-gradient(90deg, var(--brand), #fb7185 45%, var(--gold) 100%);
+}
+
+body.dark input,
+body.dark select,
+body.dark textarea{
+  background:#111827 !important;
+  color:#f9fafb !important;
+  border:1px solid rgba(255,255,255,.12) !important;
+  box-shadow:none;
+}
+
+body.dark input::placeholder,
+body.dark textarea::placeholder{
+  color:#94a3b8;
+}
+
+body.dark input:disabled{
+  background:#0f172a !important;
+  color:#cbd5e1 !important;
+}
+
+body.dark input:hover,
+body.dark select:hover,
+body.dark textarea:hover{
+  background:#0f172a !important;
+  border-color:rgba(239,68,68,.35) !important;
+}
+
+body.dark input:focus,
+body.dark select:focus,
+body.dark textarea:focus{
+  background:#111827 !important;
+  border-color:rgba(239,68,68,.6) !important;
+  box-shadow:0 0 0 4px rgba(239,68,68,.12) !important;
+}
+
+body.dark .tabs{
+  background:rgba(15,23,42,.72);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:none;
+}
+
+body.dark .tab{
+  color:#cbd5e1;
+}
+
+body.dark .tab:hover{
+  color:#fff;
+  background:rgba(239,68,68,.10);
+  border-color:rgba(239,68,68,.18);
+}
+
+body.dark .tab.active{
+  color:#fff;
+  background:linear-gradient(180deg, #ef4444, #dc2626);
+  box-shadow:0 10px 22px rgba(239,68,68,.25);
+}
+
+body.dark button.secondary{
+  background:linear-gradient(180deg, #1f2937, #111827);
+  color:#f9fafb;
+  border-color:rgba(255,255,255,.10);
+}
+
+body.dark button.secondary:hover{
+  background:linear-gradient(180deg, #273449, #172033);
+}
+
+body.dark button.danger{
+  background:linear-gradient(180deg, rgba(127,29,29,.35), rgba(69,10,10,.45));
+  color:#fecaca;
+  border-color:rgba(248,113,113,.20);
+}
+
+body.dark .sectionHead:hover{
+  background:rgba(239,68,68,.08);
+}
+
+body.dark .sectionHead .chev{
+  background:rgba(239,68,68,.12);
+  color:#fca5a5;
+}
+
+body.dark .sectionCard.open .sectionHead .chev{
+  background:rgba(239,68,68,.20);
+  color:#fff;
+}
+
+body.dark .pageSub,
+body.dark .hint,
+body.dark .quickMiniSub,
+body.dark .colorSub,
+body.dark .miniMuted,
+body.dark .sectionHead .sub,
+body.dark .authSub,
+body.dark .brandSub{
+  color:#94a3b8;
+}
+
+body.dark label,
+body.dark h1,
+body.dark h2,
+body.dark h3,
+body.dark h4,
+body.dark .appName,
+body.dark .brandTitle,
+body.dark .authTitle,
+body.dark .quickMiniTitle,
+body.dark .colorLabel,
+body.dark .modal-title{
+  color:#f9fafb;
+}
+
+body.dark table{
+  background:#111827;
+  border:1px solid rgba(255,255,255,.08);
+}
+
+body.dark th{
+  background:linear-gradient(180deg, #1f2937, #172033);
+  color:#f9fafb;
+  border-right:1px solid rgba(255,255,255,.08);
+}
+
+body.dark td{
+  background:#0f172a;
+  color:#e5e7eb;
+  border-right:1px solid rgba(255,255,255,.06);
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+body.dark tr:hover td{
+  background:#162033;
+}
+
+body.dark iframe{
+  background:#0f172a;
+}
+
+body.dark .toast{
+  background:#020617;
+  color:#f8fafc;
+  border:1px solid rgba(255,255,255,.08);
+}
+
+body.dark .modal{
+  background:rgba(2,6,23,.68);
+}
+
+body.dark .brandLogo,
+body.dark .bootLogoWrap{
+  background:linear-gradient(180deg, #1f2937, #111827);
+  border:1px solid rgba(255,255,255,.08);
+}
+
+body.dark .heroStripe{
+  border:1px solid rgba(255,255,255,.08);
+}
+
+body.dark .panelBadge,
+body.dark .pill{
+  background:rgba(244,197,66,.12);
+  color:#fde68a;
+  border-color:rgba(244,197,66,.28);
+}
 </style>
 </head>
 <body class="booting">
@@ -1028,6 +1217,7 @@
 <div>
   <button class="secondary" type="button" id="btnLogout">Logout</button>
 </div>
+ </div>
         <div class="tabs">
           <div class="tab active" id="tabLhk" data-tab="lhk">Penyusunan LKH</div>
           <div class="tab" id="tabFiles" data-tab="files">Dokumen Saya</div>
