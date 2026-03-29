@@ -1300,11 +1300,19 @@ body.dark .heroStripe{
                 <div><label for="nip">NIP</label><input id="nip" disabled></div>
               </div>
               <div class="row">
-                <div><label for="subBagian">Sub Bagian</label><select id="subBagian">
-  <option value="" selected>-- Pilih Sub Bagian --</option>
-</select>
-                <div><label for="jabatan">Jabatan</label><input id="jabatan" placeholder="Masukkan jabatan"></div>
-              </div>
+<div class="row">
+  <div>
+    <label for="subBagian">Sub Bagian</label>
+    <select id="subBagian">
+      <option value="" selected>-- Pilih Sub Bagian --</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="jabatan">Jabatan</label>
+    <input id="jabatan" placeholder="Masukkan jabatan">
+  </div>
+</div>
               <div class="row">
                 <div><label for="month">Bulan</label>
                   <select id="month">
@@ -1323,9 +1331,12 @@ body.dark .heroStripe{
               </div>
               <label for="jabatanPembuat">Jabatan Pembuat</label><input id="jabatanPembuat" disabled><div class="hint">Terisi otomatis mengikuti jabatan yang Anda input.</div>
               
-<select id="jabatanAtasan">
-  <option value="" selected>-- Pilih Jabatan Atasan --</option>
-</select>
+<div>
+  <label for="jabatanAtasan">Jabatan Atasan</label>
+  <select id="jabatanAtasan">
+    <option value="" selected>-- Pilih Jabatan Atasan --</option>
+  </select>
+</div>
               <div class="row">
                 <div><label for="namaAtasan">Nama Atasan</label><select id="namaAtasan"></select></div>
                 <div><label for="nipAtasan">NIP Atasan</label><input id="nipAtasan" disabled><div class="hint">NIP atasan akan terisi otomatis berdasarkan data yang tersimpan.</div></div>
