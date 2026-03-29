@@ -1479,41 +1479,7 @@ body.dark .heroStripe{
     </div>
   </div>
 </div>
-          <div class="sectionCard popupPanel hidden" id="secLhkColors">
-            <button type="button" class="sectionHead" onclick="toggleSection('secLhkColors')"><span class="left"><span class="title">Preferensi Tampilan Dokumen</span><span class="sub">Atur warna dokumen secara visual agar preview dan hasil PDF lebih enak dilihat.</span></span><span class="chev">⌄</span></button>
-            <div class="sectionBody">
-              <div class="pageSub" style="margin-top:12px;">Atur tampilan warna dokumen dengan cara yang lebih visual. Warna yang dipilih akan langsung dipakai saat preview dan export PDF.</div>
-              <div class="colorGrid">
-                <div class="colorItem"><div class="colorPreview" id="previewColorHeader" style="background:#dbeafe;"></div><div class="colorLabel">Warna Header Tabel</div><div class="colorSub">Dipakai untuk baris judul kolom tabel.</div><label for="colorHeader">Pilih warna</label><input id="colorHeader" type="color" value="#dbeafe"></div>
-                <div class="colorItem"><div class="colorPreview" id="previewColorDateCol" style="background:#f3f4f6;"></div><div class="colorLabel">Warna Kolom Hari / Tanggal</div><div class="colorSub">Mewarnai kolom tanggal agar lebih mudah dibaca.</div><label for="colorDateCol">Pilih warna</label><input id="colorDateCol" type="color" value="#f3f4f6"></div>
-                <div class="colorItem"><div class="colorPreview" id="previewColorOffRow" style="background:#fef3c7;"></div><div class="colorLabel">Warna Hari Libur / Akhir Pekan</div><div class="colorSub">Dipakai saat opsi sorot hari non-kerja diaktifkan.</div><label for="colorOffRow">Pilih warna</label><input id="colorOffRow" type="color" value="#fef3c7"></div>
-              </div>
-              <div class="row" style="margin-top:14px;">
-                <div><label for="enableOffHighlight">Sorot Hari Libur / Akhir Pekan</label><select id="enableOffHighlight"><option value="no" selected>Tidak disorot</option><option value="yes">Sorot otomatis</option></select></div>
-                <div><label for="showSubHead">Baris Sub-Header (1, 2, 3, 4, 5)</label><select id="showSubHead"><option value="yes" selected>Tampilkan</option><option value="no">Sembunyikan</option></select></div>
-              </div>
-              <div class="row" style="margin-top:14px;">
-                <div><label for="hideSaturday">Hari Sabtu</label><select id="hideSaturday"><option value="no" selected>Tampilkan</option><option value="yes">Sembunyikan</option></select></div>
-                <div><label for="hideSunday">Hari Minggu</label><select id="hideSunday"><option value="no" selected>Tampilkan</option><option value="yes">Sembunyikan</option></select></div>
-              </div>
-              <div class="row" style="margin-top:14px;">
-                <div><label for="showKet">Kolom Keterangan (Ket.)</label><select id="showKet"><option value="yes" selected>Tampilkan</option><option value="no">Sembunyikan</option></select></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="sectionCard popupPanel hidden" id="secLhkDraft">
-            <button type="button" class="sectionHead" onclick="toggleSection('secLhkDraft')"><span class="left"><span class="title">Draft</span><span class="sub">Simpan draft, buka kembali data sebelumnya, lalu lanjutkan pekerjaan tanpa mengulang dari awal.</span></span><span class="chev">⌄</span></button>
-            <div class="sectionBody">
-              <div class="row">
-                <div><label for="draftSelect">Daftar Draft</label><select id="draftSelect"></select><div class="hint">Setiap draft disimpan berdasarkan bulan dan tahun laporan.</div></div>
-                <div><label>&nbsp;</label><button type="button" class="secondary" id="btnRefreshDrafts">Refresh Draft</button></div>
-              </div>
-              <div class="row"><button type="button" class="secondary" id="btnSaveDraft">Simpan Draft</button><button type="button" id="btnLoadDraft">Muat Draft</button></div>
-              <button type="button" class="danger" id="btnDeleteDraft">Hapus Draft Terpilih</button>
-            </div>
-          </div>
-
+         
           <div class="sectionCard open" id="secLhkPreview">
             <button type="button" class="sectionHead" onclick="toggleSection('secLhkPreview')"><span class="left"><span class="title">Preview</span><span class="sub">Tinjau hasil dokumen sebelum diunduh agar susunan tabel dan isi laporan sudah sesuai.</span></span><span class="chev">⌄</span></button>
             <div class="sectionBody">
@@ -3137,5 +3103,40 @@ document.addEventListener('keydown', (e)=>{
   });
 </script>
   <div id="popupOverlay" class="popupOverlay hidden" onclick="closePopupPanels()"></div>
+   <div class="sectionCard popupPanel hidden" id="secLhkColors">
+            <button type="button" class="sectionHead" onclick="toggleSection('secLhkColors')"><span class="left"><span class="title">Preferensi Tampilan Dokumen</span><span class="sub">Atur warna dokumen secara visual agar preview dan hasil PDF lebih enak dilihat.</span></span><span class="chev">⌄</span></button>
+            <div class="sectionBody">
+              <div class="pageSub" style="margin-top:12px;">Atur tampilan warna dokumen dengan cara yang lebih visual. Warna yang dipilih akan langsung dipakai saat preview dan export PDF.</div>
+              <div class="colorGrid">
+                <div class="colorItem"><div class="colorPreview" id="previewColorHeader" style="background:#dbeafe;"></div><div class="colorLabel">Warna Header Tabel</div><div class="colorSub">Dipakai untuk baris judul kolom tabel.</div><label for="colorHeader">Pilih warna</label><input id="colorHeader" type="color" value="#dbeafe"></div>
+                <div class="colorItem"><div class="colorPreview" id="previewColorDateCol" style="background:#f3f4f6;"></div><div class="colorLabel">Warna Kolom Hari / Tanggal</div><div class="colorSub">Mewarnai kolom tanggal agar lebih mudah dibaca.</div><label for="colorDateCol">Pilih warna</label><input id="colorDateCol" type="color" value="#f3f4f6"></div>
+                <div class="colorItem"><div class="colorPreview" id="previewColorOffRow" style="background:#fef3c7;"></div><div class="colorLabel">Warna Hari Libur / Akhir Pekan</div><div class="colorSub">Dipakai saat opsi sorot hari non-kerja diaktifkan.</div><label for="colorOffRow">Pilih warna</label><input id="colorOffRow" type="color" value="#fef3c7"></div>
+              </div>
+              <div class="row" style="margin-top:14px;">
+                <div><label for="enableOffHighlight">Sorot Hari Libur / Akhir Pekan</label><select id="enableOffHighlight"><option value="no" selected>Tidak disorot</option><option value="yes">Sorot otomatis</option></select></div>
+                <div><label for="showSubHead">Baris Sub-Header (1, 2, 3, 4, 5)</label><select id="showSubHead"><option value="yes" selected>Tampilkan</option><option value="no">Sembunyikan</option></select></div>
+              </div>
+              <div class="row" style="margin-top:14px;">
+                <div><label for="hideSaturday">Hari Sabtu</label><select id="hideSaturday"><option value="no" selected>Tampilkan</option><option value="yes">Sembunyikan</option></select></div>
+                <div><label for="hideSunday">Hari Minggu</label><select id="hideSunday"><option value="no" selected>Tampilkan</option><option value="yes">Sembunyikan</option></select></div>
+              </div>
+              <div class="row" style="margin-top:14px;">
+                <div><label for="showKet">Kolom Keterangan (Ket.)</label><select id="showKet"><option value="yes" selected>Tampilkan</option><option value="no">Sembunyikan</option></select></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sectionCard popupPanel hidden" id="secLhkDraft">
+            <button type="button" class="sectionHead" onclick="toggleSection('secLhkDraft')"><span class="left"><span class="title">Draft</span><span class="sub">Simpan draft, buka kembali data sebelumnya, lalu lanjutkan pekerjaan tanpa mengulang dari awal.</span></span><span class="chev">⌄</span></button>
+            <div class="sectionBody">
+              <div class="row">
+                <div><label for="draftSelect">Daftar Draft</label><select id="draftSelect"></select><div class="hint">Setiap draft disimpan berdasarkan bulan dan tahun laporan.</div></div>
+                <div><label>&nbsp;</label><button type="button" class="secondary" id="btnRefreshDrafts">Refresh Draft</button></div>
+              </div>
+              <div class="row"><button type="button" class="secondary" id="btnSaveDraft">Simpan Draft</button><button type="button" id="btnLoadDraft">Muat Draft</button></div>
+              <button type="button" class="danger" id="btnDeleteDraft">Hapus Draft Terpilih</button>
+            </div>
+          </div>
+
 </body>
 </html>
