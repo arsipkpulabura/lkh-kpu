@@ -1320,7 +1320,9 @@ body.dark .heroStripe{
                 <div><label for="fontIn">Ukuran Font di Dalam Tabel</label><select id="fontIn"><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12" selected>12</option><option value="13">13</option><option value="14">14</option></select></div>
               </div>
               <label for="jabatanPembuat">Jabatan Pembuat</label><input id="jabatanPembuat" disabled><div class="hint">Terisi otomatis mengikuti jabatan yang Anda input.</div>
-              <label for="jabatanAtasan">Jabatan Atasan</label><select id="jabatanAtasan"></select>
+              <select id="jabatanAtasan">
+  <option value="" disabled selected hidden>-- Pilih Jabatan Atasan --</option>
+</select>
               <div class="row">
                 <div><label for="namaAtasan">Nama Atasan</label><select id="namaAtasan"></select></div>
                 <div><label for="nipAtasan">NIP Atasan</label><input id="nipAtasan" disabled><div class="hint">NIP atasan akan terisi otomatis berdasarkan data yang tersimpan.</div></div>
