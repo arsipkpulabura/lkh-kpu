@@ -1020,12 +1020,14 @@
             <div class="pageSub">Laporan Kinerja Harian</div>
             <div class="pageSub" id="whoami"></div>
           </div>
-          <div>
+<div>
   <button type="button" class="secondary" id="btnToggleTheme">
     🌙 Mode Gelap
   </button>
-</div><button class="secondary" type="button" id="btnLogout">Logout</button></div>
-        </div>
+</div>
+<div>
+  <button class="secondary" type="button" id="btnLogout">Logout</button>
+</div>
         <div class="tabs">
           <div class="tab active" id="tabLhk" data-tab="lhk">Penyusunan LKH</div>
           <div class="tab" id="tabFiles" data-tab="files">Dokumen Saya</div>
@@ -1895,6 +1897,8 @@ function loadTheme(){
 
   window.addEventListener('load', ()=>{
     bindLoginEnterBehavior();
+      loadTheme();
+  $('btnToggleTheme')?.addEventListener('click', toggleTheme);
     $('loginView')?.classList.add('hidden'); $('appView')?.classList.add('hidden');
 
     $('btnLogin')?.addEventListener('click', e=>{ e.preventDefault(); doLogin(); });
