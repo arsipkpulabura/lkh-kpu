@@ -1425,6 +1425,7 @@ body.dark .heroStripe{
   let atasanOptions = [];
   let heartbeatTimer = null;
   const TOKEN_KEY = 'lhk_token_v1';
+  const THEME_KEY = 'lhk_theme';
 
   function bumpAuthNonce(){ authNonce++; return authNonce; }
   const $ = id => document.getElementById(id);
@@ -1459,6 +1460,7 @@ body.dark .heroStripe{
     if (userEl) userEl.addEventListener('keydown', (e)=>{ if (e.key === 'Enter'){ e.preventDefault(); passEl && passEl.focus(); } });
     if (passEl) passEl.addEventListener('keydown', (e)=>{ if (e.key === 'Enter'){ e.preventDefault(); doLogin(); } });
   }
+
   function setLoginStatus(msg){ if ($('loginStatus')) $('loginStatus').textContent = msg || ''; }
   function setStatus(msg){ if ($('status')) $('status').textContent = msg || ''; }
 
@@ -1490,45 +1492,92 @@ body.dark .heroStripe{
     if (name === 'files') refreshFiles();
     if (name === 'pass') refreshUploadFolders();
     if (name === 'admin') {
-      adminRefreshUploadRoot(); adminRefreshUploadFolders(); adminRefreshNotifications(); adminRefreshNotificationsQuick(); adminRefreshOnlineUsers(); adminLoadUsers(); adminRefreshLogs();
+      adminRefreshUploadRoot();
+      adminRefreshUploadFolders();
+      adminRefreshNotifications();
+      adminRefreshNotificationsQuick();
+      adminRefreshOnlineUsers();
+      adminLoadUsers();
+      adminRefreshLogs();
     }
   }
+
   function toggleSection(id){ document.getElementById(id)?.classList.toggle('open'); }
   function openSection(id){ document.getElementById(id)?.classList.add('open'); }
   function closeSection(id){ document.getElementById(id)?.classList.remove('open'); }
+
   function setupDefaultSections(){
-    openSection('secLhkForm'); closeSection('secLhkColors'); closeSection('secLhkDraft'); openSection('secLhkPreview');
-    openSection('secFilesList'); openSection('secUploadLhk'); closeSection('secChangePassword'); closeSection('secChangeEmail');
-    openSection('secAdminUpload'); closeSection('secAdminNotif'); closeSection('secAdminOnlineUsers'); closeSection('secAdminUsers'); closeSection('secAdminLogs');
+    openSection('secLhkForm');
+    closeSection('secLhkColors');
+    closeSection('secLhkDraft');
+    openSection('secLhkPreview');
+
+    openSection('secFilesList');
+
+    openSection('secUploadLhk');
+    closeSection('secChangePassword');
+    closeSection('secChangeEmail');
+
+    openSection('secAdminUpload');
+    closeSection('secAdminNotif');
+    closeSection('secAdminOnlineUsers');
+    closeSection('secAdminUsers');
+    closeSection('secAdminLogs');
   }
 
-  function saveTokenLocal(t){ try{ if (t) localStorage.setItem(TOKEN_KEY, t); else localStorage.removeItem(TOKEN_KEY); }catch(e){} }
-  function loadTokenLocal(){ try{ return localStorage.getItem(TOKEN_KEY) || ''; }catch(e){ return ''; } }
+  function saveTokenLocal(t){
+    try{
+      if (t) localStorage.setItem(TOKEN_KEY, t);
+      else localStorage.removeItem(TOKEN_KEY);
+    }catch(e){}
+  }
+
+  function loadTokenLocal(){
+    try{
+      return localStorage.getItem(TOKEN_KEY) || '';
+    }catch(e){
+      return '';
+    }
+  }
 
   async function tryAutoLogin(){
     const t = loadTokenLocal();
-    if (!t){ finishBoot(); showLogin(); return; }
+    if (!t){
+      finishBoot();
+      showLogin();
+      return;
+    }
     const n = bumpAuthNonce();
     try {
       const res = await apiCall('getSession', {}, t);
       if (n !== authNonce) return;
-      token = t; sessionUser = res.user || null; finishBoot(); afterLogin(true);
+      token = t;
+      sessionUser = res.user || null;
+      finishBoot();
+      afterLogin(true);
     } catch (e) {
       if (n !== authNonce) return;
-      saveTokenLocal(''); finishBoot(); showLogin();
+      saveTokenLocal('');
+      finishBoot();
+      showLogin();
     }
   }
 
   async function doLogin(){
     const username = ($('loginUsername')?.value || '').trim();
     const pass = $('loginPass')?.value || '';
-    if (!username || !pass){ setLoginStatus('Isi username dan password terlebih dahulu.'); return; }
+    if (!username || !pass){
+      setLoginStatus('Isi username dan password terlebih dahulu.');
+      return;
+    }
     setLoginStatus('Sedang login...');
     const n = bumpAuthNonce();
     try{
       const res = await apiCall('login', { username, password: pass }, '');
       if (n !== authNonce) return;
-      token = res.token || ''; sessionUser = res.user || null; saveTokenLocal(token);
+      token = res.token || '';
+      sessionUser = res.user || null;
+      saveTokenLocal(token);
       try { modalHide(); } catch(e){}
       afterLogin(false);
     }catch(err){
@@ -1538,42 +1587,127 @@ body.dark .heroStripe{
   }
 
   function startHeartbeat(){
-    stopHeartbeat(); if (!token) return;
+    stopHeartbeat();
+    if (!token) return;
     apiCall('heartbeat').catch(()=>{});
-    heartbeatTimer = setInterval(()=>{ if (token) apiCall('heartbeat').catch(()=>{}); }, 60000);
+    heartbeatTimer = setInterval(()=>{
+      if (token) apiCall('heartbeat').catch(()=>{});
+    }, 60000);
   }
-  function stopHeartbeat(){ if (heartbeatTimer){ clearInterval(heartbeatTimer); heartbeatTimer = null; } }
+
+  function stopHeartbeat(){
+    if (heartbeatTimer){
+      clearInterval(heartbeatTimer);
+      heartbeatTimer = null;
+    }
+  }
 
   function doLogout(){
     bumpAuthNonce();
     const t = token;
     stopHeartbeat();
-    if (window.__syncTimer) { clearInterval(window.__syncTimer); window.__syncTimer = null; }
-    token = ''; sessionUser = null; currentDays = []; sigPembuatB64 = ''; sigAtasanB64 = ''; atasanOptions = [];
+    if (window.__syncTimer) {
+      clearInterval(window.__syncTimer);
+      window.__syncTimer = null;
+    }
+    token = '';
+    sessionUser = null;
+    currentDays = [];
+    sigPembuatB64 = '';
+    sigAtasanB64 = '';
+    atasanOptions = [];
     saveTokenLocal('');
     try { $('preview').srcdoc = ''; } catch(e){}
-    try { setStatus(''); setLoginStatus(''); $('loginUsername').value=''; $('loginPass').value=''; } catch(e){}
-    showLogin(); showTab('lhk');
+    try {
+      setStatus('');
+      setLoginStatus('');
+      if ($('loginUsername')) $('loginUsername').value = '';
+      if ($('loginPass')) $('loginPass').value = '';
+    } catch(e){}
+    showLogin();
+    showTab('lhk');
     apiCall('logout', {}, t).catch(()=>{});
   }
 
-  function fillSelect(id, arr){ const sel = $(id); if (!sel) return; sel.innerHTML = ''; (arr||[]).forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o); }); }
-  function fillAtasanSelect(arr){
-    atasanOptions = Array.isArray(arr) ? arr : [];
-    const sel = $('namaAtasan'); if (!sel) return;
+  function fillSelect(id, arr){
+    const sel = $(id);
+    if (!sel) return;
     sel.innerHTML = '';
-    atasanOptions.forEach(x=>{ const o=document.createElement('option'); o.value=x.nama||''; o.textContent=x.nama||''; sel.appendChild(o); });
-    syncAtasanNip();
+    (arr || []).forEach(v=>{
+      const o = document.createElement('option');
+      o.value = v;
+      o.textContent = v;
+      sel.appendChild(o);
+    });
   }
-  function syncAtasanNip(){ const sel=$('namaAtasan'), nip=$('nipAtasan'); if (!sel || !nip) return; const picked = atasanOptions.find(x=>String(x.nama||'')===String(sel.value||'')); nip.value = picked ? (picked.nip||'') : ''; }
-  function bindColorPreview(idInput,idPreview){ const input=$(idInput), preview=$(idPreview); if (!input||!preview) return; const sync=()=> preview.style.background=input.value||'#ffffff'; input.oninput=sync; sync(); }
+
+  function fillAtasanByJabatan(selectedNama = ''){
+    const jabatanEl = $('jabatanAtasan');
+    const namaEl = $('namaAtasan');
+    const nipEl = $('nipAtasan');
+    if (!jabatanEl || !namaEl) return;
+
+    const jabatan = String(jabatanEl.value || '').trim();
+
+    const filtered = atasanOptions.filter(item =>
+      String(item?.jabatan || '').trim() === jabatan
+    );
+
+    namaEl.innerHTML = '';
+
+    const first = document.createElement('option');
+    first.value = '';
+    first.textContent = filtered.length ? 'Pilih nama atasan' : 'Tidak ada data';
+    namaEl.appendChild(first);
+
+    filtered.forEach(item => {
+      const o = document.createElement('option');
+      o.value = String(item?.nama || '');
+      o.textContent = String(item?.nama || '');
+      namaEl.appendChild(o);
+    });
+
+    if (selectedNama) {
+      const found = filtered.find(item => String(item?.nama || '') === String(selectedNama));
+      if (found) namaEl.value = found.nama;
+    }
+
+    if (nipEl) nipEl.value = '';
+  }
+
+  function syncAtasanNip(){
+    const jabatanEl = $('jabatanAtasan');
+    const namaEl = $('namaAtasan');
+    const nipEl = $('nipAtasan');
+    if (!jabatanEl || !namaEl || !nipEl) return;
+
+    const jabatan = String(jabatanEl.value || '').trim();
+    const nama = String(namaEl.value || '').trim();
+
+    const found = atasanOptions.find(item =>
+      String(item?.jabatan || '').trim() === jabatan &&
+      String(item?.nama || '').trim() === nama
+    );
+
+    nipEl.value = found ? String(found.nip || '') : '';
+  }
+
+  function bindColorPreview(idInput,idPreview){
+    const input = $(idInput), preview = $(idPreview);
+    if (!input || !preview) return;
+    const sync = ()=> preview.style.background = input.value || '#ffffff';
+    input.oninput = sync;
+    sync();
+  }
 
   async function afterLogin(isAuto){
     if (!sessionUser) return;
     showApp();
+
     if ($('whoami')) $('whoami').textContent = `${sessionUser.nama} (${sessionUser.nip}) - ${sessionUser.role}`;
     if ($('nama')) $('nama').value = sessionUser.nama || '';
     if ($('nip')) $('nip').value = sessionUser.nip || '';
+
     const isAdminLike = String(sessionUser.role || '').toLowerCase() === 'admin';
     if ($('tabAdmin')) $('tabAdmin').classList.toggle('hidden', !isAdminLike);
     if ($('adminQuickRow')) $('adminQuickRow').classList.toggle('hidden', !isAdminLike);
@@ -1586,34 +1720,68 @@ body.dark .heroStripe{
       $('month')?.removeEventListener('change', window.__holidayPlaceholderHandler);
       $('year')?.removeEventListener('change', window.__holidayPlaceholderHandler);
     }
-    window.__holidayPlaceholderHandler = ()=>{ resetCurrentDaysIfPeriodChanged(); updateHolidayPlaceholder(false); };
+
+    window.__holidayPlaceholderHandler = ()=>{
+      resetCurrentDaysIfPeriodChanged();
+      updateHolidayPlaceholder(false);
+    };
+
     $('month')?.addEventListener('change', window.__holidayPlaceholderHandler);
     $('year')?.addEventListener('change', window.__holidayPlaceholderHandler);
 
     window.__lastPeriodMonth = Number(now.getMonth() + 1);
     window.__lastPeriodYear = Number(now.getFullYear());
 
-    const jab = $('jabatan'); const jp = $('jabatanPembuat'); if (jp) jp.disabled = true;
-    window.__mirrorJabatanPembuat = ()=>{ if (jp) jp.value = (jab && jab.value) ? jab.value : ''; };
+    const jab = $('jabatan');
+    const jp = $('jabatanPembuat');
+    if (jp) jp.disabled = true;
+
+    window.__mirrorJabatanPembuat = ()=>{
+      if (jp) jp.value = (jab && jab.value) ? jab.value : '';
+    };
+
     if (jab) jab.oninput = window.__mirrorJabatanPembuat;
 
     try {
       const opt = await apiCall('getOptions');
+
       fillSelect('subBagian', opt?.subBagian || []);
       fillSelect('jabatanAtasan', opt?.kasubbag || []);
-      fillAtasanSelect(opt?.atasanList || []);
-      if ($('namaAtasan')) $('namaAtasan').onchange = syncAtasanNip;
+
+      atasanOptions = Array.isArray(opt?.atasanList) ? opt.atasanList : [];
+
+      const jabatanAtasanEl = $('jabatanAtasan');
+      const namaAtasanEl = $('namaAtasan');
+
+      if (jabatanAtasanEl) {
+        jabatanAtasanEl.onchange = () => {
+          fillAtasanByJabatan();
+          syncAtasanNip();
+        };
+      }
+
+      if (namaAtasanEl) {
+        namaAtasanEl.onchange = () => {
+          syncAtasanNip();
+        };
+      }
 
       const res = await apiCall('getMyPrefs');
       const p = res?.prefs || {};
-      const set = (id,v)=>{ if ($(id)) $(id).value = v ?? ''; };
+
+      const set = (id, v)=>{
+        if ($(id)) $(id).value = v ?? '';
+      };
+
       set('subBagian', p.subBagian || $('subBagian')?.value || '');
       set('jabatan', p.jabatan || '');
       set('kota', p.kota || '');
       set('jabatanPembuat', p.jabatanPembuat || '');
       set('jabatanAtasan', p.jabatanAtasan || '');
-      set('namaAtasan', p.namaAtasan || '');
+
+      fillAtasanByJabatan(p.namaAtasan || '');
       syncAtasanNip();
+
       if (window.__mirrorJabatanPembuat) window.__mirrorJabatanPembuat();
     } catch(e) {
       toast('Gagal memuat preferensi: ' + (e?.message || e), 4000);
@@ -1625,14 +1793,25 @@ body.dark .heroStripe{
     if ($('sigPembuatFile')) $('sigPembuatFile').onchange = () => {
       const file = $('sigPembuatFile').files?.[0];
       if (!file) { sigPembuatB64=''; return; }
-      readFileAsB64(file, (b64)=>{ sigPembuatB64 = b64 || ''; if (sigPembuatB64) toast('Tanda tangan pembuat berhasil dimuat'); });
+      readFileAsB64(file, (b64)=>{
+        sigPembuatB64 = b64 || '';
+        if (sigPembuatB64) toast('Tanda tangan pembuat berhasil dimuat');
+      });
     };
+
     if ($('sigAtasanFile')) $('sigAtasanFile').onchange = () => {
       const file = $('sigAtasanFile').files?.[0];
       if (!file) { sigAtasanB64=''; return; }
-      readFileAsB64(file, (b64)=>{ sigAtasanB64 = b64 || ''; if (sigAtasanB64) toast('Tanda tangan atasan berhasil dimuat'); });
+      readFileAsB64(file, (b64)=>{
+        sigAtasanB64 = b64 || '';
+        if (sigAtasanB64) toast('Tanda tangan atasan berhasil dimuat');
+      });
     };
-    if ($('signatureMode')) { $('signatureMode').removeEventListener('change', applySignatureModeUI); $('signatureMode').addEventListener('change', applySignatureModeUI); }
+
+    if ($('signatureMode')) {
+      $('signatureMode').removeEventListener('change', applySignatureModeUI);
+      $('signatureMode').addEventListener('change', applySignatureModeUI);
+    }
 
     bindColorPreview('colorHeader', 'previewColorHeader');
     bindColorPreview('colorDateCol', 'previewColorDateCol');
@@ -1643,38 +1822,69 @@ body.dark .heroStripe{
     setupDefaultSections();
     startHeartbeat();
 
-    if (isAdminLike) { adminRefreshNotificationsQuick(); adminRefreshOnlineUsers(); }
+    if (isAdminLike) {
+      adminRefreshNotificationsQuick();
+      adminRefreshOnlineUsers();
+    }
+
     updateHolidayPlaceholder(false);
     if (!isAuto) toast('Login berhasil');
   }
 
   function resetCurrentDaysIfPeriodChanged(){
-    const month = Number($('month')?.value || 0), year = Number($('year')?.value || 0);
-    const prevMonth = Number(window.__lastPeriodMonth || 0), prevYear = Number(window.__lastPeriodYear || 0);
-    if (month !== prevMonth || year !== prevYear){ currentDays = []; window.__lastPeriodMonth = month; window.__lastPeriodYear = year; }
+    const month = Number($('month')?.value || 0);
+    const year = Number($('year')?.value || 0);
+    const prevMonth = Number(window.__lastPeriodMonth || 0);
+    const prevYear = Number(window.__lastPeriodYear || 0);
+    if (month !== prevMonth || year !== prevYear){
+      currentDays = [];
+      window.__lastPeriodMonth = month;
+      window.__lastPeriodYear = year;
+    }
   }
 
   function getFormData(){
     return {
-      nama: $('nama')?.value || '', nip: $('nip')?.value || '', subBagian: $('subBagian')?.value || '',
-      jabatan: $('jabatan')?.value || '', jabatanPembuat: $('jabatanPembuat')?.value || '', month: $('month')?.value || '',
-      year: $('year')?.value || '', kota: $('kota')?.value || '', holidays: $('holidays')?.value || '',
-      fontOut: $('fontOut')?.value || '12', fontIn: $('fontIn')?.value || '12',
-      colorHeader: $('colorHeader')?.value || '#dbeafe', colorDateCol: $('colorDateCol')?.value || '#f3f4f6',
-      colorOffRow: $('colorOffRow')?.value || '#fef3c7', enableOffHighlight: $('enableOffHighlight')?.value || 'no',
-      showSubHead: $('showSubHead')?.value || 'yes', showKet: $('showKet')?.value || 'yes', hideSaturday: $('hideSaturday')?.value || 'no',
-      hideSunday: $('hideSunday')?.value || 'no', jabatanAtasan: $('jabatanAtasan')?.value || '', namaAtasan: $('namaAtasan')?.value || '',
-      nipAtasan: $('nipAtasan')?.value || '', sigPembuatB64, sigAtasanB64, exportMode: false, signatureMode: $('signatureMode')?.value || 'text',
-      pdfMode: $('pdfMode')?.value || 'default', days: currentDays
+      nama: $('nama')?.value || '',
+      nip: $('nip')?.value || '',
+      subBagian: $('subBagian')?.value || '',
+      jabatan: $('jabatan')?.value || '',
+      jabatanPembuat: $('jabatanPembuat')?.value || '',
+      month: $('month')?.value || '',
+      year: $('year')?.value || '',
+      kota: $('kota')?.value || '',
+      holidays: $('holidays')?.value || '',
+      fontOut: $('fontOut')?.value || '12',
+      fontIn: $('fontIn')?.value || '12',
+      colorHeader: $('colorHeader')?.value || '#dbeafe',
+      colorDateCol: $('colorDateCol')?.value || '#f3f4f6',
+      colorOffRow: $('colorOffRow')?.value || '#fef3c7',
+      enableOffHighlight: $('enableOffHighlight')?.value || 'no',
+      showSubHead: $('showSubHead')?.value || 'yes',
+      showKet: $('showKet')?.value || 'yes',
+      hideSaturday: $('hideSaturday')?.value || 'no',
+      hideSunday: $('hideSunday')?.value || 'no',
+      jabatanAtasan: $('jabatanAtasan')?.value || '',
+      namaAtasan: $('namaAtasan')?.value || '',
+      nipAtasan: $('nipAtasan')?.value || '',
+      sigPembuatB64,
+      sigAtasanB64,
+      exportMode: false,
+      signatureMode: $('signatureMode')?.value || 'text',
+      pdfMode: $('pdfMode')?.value || 'default',
+      days: currentDays
     };
   }
 
   async function updateHolidayPlaceholder(autoFill=false){
-    const month = $('month')?.value || '', year = $('year')?.value || '', holidaysEl = $('holidays');
+    const month = $('month')?.value || '';
+    const year = $('year')?.value || '';
+    const holidaysEl = $('holidays');
     if (!holidaysEl || !token || !month || !year) return;
     try{
       const res = await apiCall('getHolidayPlaceholderData', { month, year });
-      const placeholder = res?.placeholder || '', datesOnly = res?.datesOnly || '';
+      const placeholder = res?.placeholder || '';
+      const datesOnly = res?.datesOnly || '';
       holidaysEl.placeholder = placeholder ? `Otomatis: ${placeholder}` : 'Contoh: 1 10 17 atau 1,10,17 atau 2026-03-29';
       if (autoFill && !String(holidaysEl.value || '').trim() && datesOnly) holidaysEl.value = datesOnly;
     }catch(e){
@@ -1691,12 +1901,20 @@ body.dark .heroStripe{
       $('preview').srcdoc = res.html || '';
       setStatus('Preview siap. Anda bisa menambah baris dan mengedit isi tabel langsung dari preview.');
       setTimeout(()=> attachIframeSync(), 300);
-    } catch (err) { setStatus('Error: ' + (err?.message || err)); }
+    } catch (err) {
+      setStatus('Error: ' + (err?.message || err));
+    }
   }
 
   function attachIframeSync(){
-    const iframe = $('preview'); if (!iframe) return;
-    let doc = null; try { doc = iframe.contentDocument || iframe.contentWindow.document; } catch(e){ return; }
+    const iframe = $('preview');
+    if (!iframe) return;
+    let doc = null;
+    try {
+      doc = iframe.contentDocument || iframe.contentWindow.document;
+    } catch(e){
+      return;
+    }
     if (!doc) return;
     syncRowsFromIframe();
     doc.querySelectorAll('#tbl textarea').forEach(el=> el.addEventListener('input', ()=> syncRowsFromIframe()));
@@ -1705,25 +1923,65 @@ body.dark .heroStripe{
   }
 
   function syncRowsFromIframe(){
-    const iframe = $('preview'); if (!iframe) return;
-    let doc = null; try { doc = iframe.contentDocument || iframe.contentWindow.document; } catch(e){ return; }
+    const iframe = $('preview');
+    if (!iframe) return;
+    let doc = null;
+    try {
+      doc = iframe.contentDocument || iframe.contentWindow.document;
+    } catch(e){
+      return;
+    }
     if (!doc) return;
-    const oldMap = new Map((Array.isArray(currentDays) ? currentDays : []).map(d => [Number(d.day), { day:Number(d.day), activities:Array.isArray(d.activities)?d.activities.map(a=>({ uraian:a?.uraian??'', output:a?.output??'', ket:a?.ket??'' })) : [] }]));
-    const rows = Array.from(doc.querySelectorAll('#tbl tbody tr[data-day][data-act]')); const visibleDays = new Set();
-    rows.forEach(tr => { const day = Number(tr.getAttribute('data-day')); if (Number.isFinite(day)) visibleDays.add(day); });
-    visibleDays.forEach(day => oldMap.set(day, { day, activities:[] }));
+
+    const oldMap = new Map(
+      (Array.isArray(currentDays) ? currentDays : []).map(d => [
+        Number(d.day),
+        {
+          day:Number(d.day),
+          activities:Array.isArray(d.activities)
+            ? d.activities.map(a=>({ uraian:a?.uraian??'', output:a?.output??'', ket:a?.ket??'' }))
+            : []
+        }
+      ])
+    );
+
+    const rows = Array.from(doc.querySelectorAll('#tbl tbody tr[data-day][data-act]'));
+    const visibleDays = new Set();
+
     rows.forEach(tr => {
-      const day = Number(tr.getAttribute('data-day')), act = Number(tr.getAttribute('data-act'));
+      const day = Number(tr.getAttribute('data-day'));
+      if (Number.isFinite(day)) visibleDays.add(day);
+    });
+
+    visibleDays.forEach(day => oldMap.set(day, { day, activities:[] }));
+
+    rows.forEach(tr => {
+      const day = Number(tr.getAttribute('data-day'));
+      const act = Number(tr.getAttribute('data-act'));
       if (!Number.isFinite(day) || !Number.isFinite(act)) return;
+
       const prevDay = Array.isArray(currentDays) ? currentDays.find(d => Number(d.day) === day) : null;
       const prevAct = prevDay?.activities?.[act] || { uraian:'', output:'', ket:'' };
-      const nextAct = { uraian: prevAct.uraian ?? '', output: prevAct.output ?? '', ket: prevAct.ket ?? '' };
-      tr.querySelectorAll('textarea[data-field]').forEach(el => { const field = el.getAttribute('data-field'); if (['uraian','output','ket'].includes(field)) nextAct[field] = el.value ?? ''; });
+      const nextAct = {
+        uraian: prevAct.uraian ?? '',
+        output: prevAct.output ?? '',
+        ket: prevAct.ket ?? ''
+      };
+
+      tr.querySelectorAll('textarea[data-field]').forEach(el => {
+        const field = el.getAttribute('data-field');
+        if (['uraian','output','ket'].includes(field)) nextAct[field] = el.value ?? '';
+      });
+
       if (!oldMap.has(day)) oldMap.set(day, { day, activities:[] });
       oldMap.get(day).activities[act] = nextAct;
     });
+
     const days = Array.from(oldMap.values()).sort((a,b)=>a.day - b.day);
-    days.forEach(d => { d.activities = (d.activities || []).filter(x => x); if (!d.activities.length) d.activities = [{ uraian:'', output:'', ket:'' }]; });
+    days.forEach(d => {
+      d.activities = (d.activities || []).filter(x => x);
+      if (!d.activities.length) d.activities = [{ uraian:'', output:'', ket:'' }];
+    });
     currentDays = days;
   }
 
@@ -1737,22 +1995,29 @@ body.dark .heroStripe{
   }
 
   async function downloadExcel(){
-    resetCurrentDaysIfPeriodChanged(); setStatus('Membuat file Excel...');
+    resetCurrentDaysIfPeriodChanged();
+    setStatus('Membuat file Excel...');
     try{
       const res = await apiCall('exportExcel', getFormData());
       dataUrlDownload(res.mimeType, res.base64, res.fileName || 'LHK.xlsx');
       setStatus('Excel berhasil diunduh. File juga tersimpan di folder Anda: ' + (res.driveUrl || ''));
-    } catch(err){ setStatus('Error: ' + (err?.message || err)); }
+    } catch(err){
+      setStatus('Error: ' + (err?.message || err));
+    }
   }
 
   async function downloadPdf(){
-    resetCurrentDaysIfPeriodChanged(); setStatus('Membuat PDF...');
+    resetCurrentDaysIfPeriodChanged();
+    setStatus('Membuat PDF...');
     try{
-      const form = getFormData(); form.exportMode = true;
+      const form = getFormData();
+      form.exportMode = true;
       const res = await apiCall('exportPdf', form);
       dataUrlDownload(res.mimeType, res.base64, res.fileName || 'LHK.pdf');
       setStatus('PDF berhasil diunduh. File juga tersimpan di folder Anda: ' + (res.driveUrl || ''));
-    } catch(err){ setStatus('Error: ' + (err?.message || err)); }
+    } catch(err){
+      setStatus('Error: ' + (err?.message || err));
+    }
   }
 
   async function refreshFiles(){
@@ -1762,11 +2027,18 @@ body.dark .heroStripe{
       const rows = Array.isArray(res) ? res : (res?.list || []);
       if ($('filesStatus')) $('filesStatus').textContent = `Total file: ${rows.length}`;
       renderFilesTable(rows);
-    } catch(err){ if ($('filesStatus')) $('filesStatus').textContent = 'Error: ' + (err?.message || err); }
+    } catch(err){
+      if ($('filesStatus')) $('filesStatus').textContent = 'Error: ' + (err?.message || err);
+    }
   }
+
   function renderFilesTable(list){
-    const box = $('filesTable'); if (!box) return;
-    if (!list?.length){ box.innerHTML = '<div class="hint">Belum ada file yang tersimpan.</div>'; return; }
+    const box = $('filesTable');
+    if (!box) return;
+    if (!list?.length){
+      box.innerHTML = '<div class="hint">Belum ada file yang tersimpan.</div>';
+      return;
+    }
     box.innerHTML = '<table><tr><th>Nama File</th><th>Lokasi</th><th>Tanggal Dibuat</th><th>Akses</th></tr>' + list.map(f=>`<tr><td>${escapeHtml(f.name||'')}</td><td>${escapeHtml(f.location||'')}</td><td>${escapeHtml(f.created||'')}</td><td><a href="${f.url}" target="_blank" rel="noopener">Buka</a></td></tr>`).join('') + '</table>';
   }
 
@@ -1775,32 +2047,66 @@ body.dark .heroStripe{
       const res = await apiCall('getMyFolderUrl');
       const url = res?.url || res;
       if (url) window.open(url, '_blank', 'noopener');
-    }catch(e){ toast('Gagal membuka folder: ' + (e?.message || e)); }
+    }catch(e){
+      toast('Gagal membuka folder: ' + (e?.message || e));
+    }
   }
 
   async function refreshUploadFolders(){
-    const sel = $('uploadFolder'), status = $('uploadStatus'); if (!sel) return;
-    sel.innerHTML = ''; if (status) status.textContent = 'Memuat folder upload...';
+    const sel = $('uploadFolder');
+    const status = $('uploadStatus');
+    if (!sel) return;
+    sel.innerHTML = '';
+    if (status) status.textContent = 'Memuat folder upload...';
     try{
       const res = await apiCall('listUploadFolders');
       const rows = Array.isArray(res) ? res : (res?.list || []);
       if (!rows.length){
-        const o = document.createElement('option'); o.value=''; o.textContent='(Belum ada folder upload)'; sel.appendChild(o);
-        if (status) status.textContent = 'Belum ada folder upload yang tersedia.'; return;
+        const o = document.createElement('option');
+        o.value = '';
+        o.textContent = '(Belum ada folder upload)';
+        sel.appendChild(o);
+        if (status) status.textContent = 'Belum ada folder upload yang tersedia.';
+        return;
       }
-      rows.forEach(x=>{ const o=document.createElement('option'); o.value=x.folderId; o.textContent=x.name||x.folderId; sel.appendChild(o); });
+      rows.forEach(x=>{
+        const o = document.createElement('option');
+        o.value = x.folderId;
+        o.textContent = x.name || x.folderId;
+        sel.appendChild(o);
+      });
       if (status) status.textContent = 'Pilih folder tujuan lalu unggah file PDF.';
-    }catch(err){ if (status) status.textContent = 'Error: ' + (err?.message || err); }
+    }catch(err){
+      if (status) status.textContent = 'Error: ' + (err?.message || err);
+    }
   }
 
   function uploadLhk(){
-    const folderId = $('uploadFolder')?.value || '', fileEl = $('uploadFile'), statusEl = $('uploadStatus'), file = fileEl?.files?.[0];
-    if (!folderId) { if (statusEl) statusEl.textContent = 'Pilih folder tujuan terlebih dahulu.'; return; }
-    if (!file) { if (statusEl) statusEl.textContent = 'Pilih file PDF terlebih dahulu.'; return; }
-    if (!String(file.name || '').toLowerCase().endsWith('.pdf')) { if (statusEl) statusEl.textContent = 'File harus berformat PDF.'; return; }
+    const folderId = $('uploadFolder')?.value || '';
+    const fileEl = $('uploadFile');
+    const statusEl = $('uploadStatus');
+    const file = fileEl?.files?.[0];
+
+    if (!folderId) {
+      if (statusEl) statusEl.textContent = 'Pilih folder tujuan terlebih dahulu.';
+      return;
+    }
+    if (!file) {
+      if (statusEl) statusEl.textContent = 'Pilih file PDF terlebih dahulu.';
+      return;
+    }
+    if (!String(file.name || '').toLowerCase().endsWith('.pdf')) {
+      if (statusEl) statusEl.textContent = 'File harus berformat PDF.';
+      return;
+    }
+
     if (statusEl) statusEl.textContent = 'Mengunggah file...';
+
     readFileAsB64(file, async (b64)=>{
-      if (!b64){ if (statusEl) statusEl.textContent = 'Gagal membaca file.'; return; }
+      if (!b64){
+        if (statusEl) statusEl.textContent = 'Gagal membaca file.';
+        return;
+      }
       try{
         const res = await apiCall('uploadLhkPdf', { folderId, fileName: file.name, base64: b64 });
         if (statusEl) statusEl.textContent = 'Upload berhasil: ' + (res.driveUrl || res.url || '');
@@ -1818,8 +2124,11 @@ body.dark .heroStripe{
     try{
       await apiCall('changeMyPassword', { oldPassword: $('oldPass')?.value || '', newPassword: $('newPass')?.value || '' });
       if ($('passStatus')) $('passStatus').textContent = 'Password berhasil diubah.';
-      if ($('oldPass')) $('oldPass').value = ''; if ($('newPass')) $('newPass').value = '';
-    }catch(err){ if ($('passStatus')) $('passStatus').textContent = 'Error: ' + (err?.message || err); }
+      if ($('oldPass')) $('oldPass').value = '';
+      if ($('newPass')) $('newPass').value = '';
+    }catch(err){
+      if ($('passStatus')) $('passStatus').textContent = 'Error: ' + (err?.message || err);
+    }
   }
 
   async function changeEmail(){
@@ -1836,18 +2145,28 @@ body.dark .heroStripe{
   }
 
   async function adminRefreshNotificationsQuick(){
-    const box = $('adminQuickInbox'); if (!box) return; box.innerHTML = 'Memuat...';
+    const box = $('adminQuickInbox');
+    if (!box) return;
+    box.innerHTML = 'Memuat...';
     try{
       const res = await apiCall('adminListNotifications');
       const rows = Array.isArray(res) ? res : (res?.list || []);
-      if (!rows.length){ box.innerHTML = '<span class="miniMuted">Belum ada notifikasi.</span>'; return; }
+      if (!rows.length){
+        box.innerHTML = '<span class="miniMuted">Belum ada notifikasi.</span>';
+        return;
+      }
       box.innerHTML = rows.slice(0,3).map(x=>`<div style="margin-bottom:8px;"><span class="pill">${String(x.isRead||'no') !== 'yes' ? 'Baru' : 'Dibaca'}</span><div style="margin-top:6px; font-weight:700;">${escapeHtml(x.title||'')}</div><div class="miniMuted">${escapeHtml(x.message||'')}</div></div>`).join('');
-    }catch(err){ box.innerHTML = `<span class="miniMuted">Error: ${escapeHtml(err?.message || err)}</span>`; }
+    }catch(err){
+      box.innerHTML = `<span class="miniMuted">Error: ${escapeHtml(err?.message || err)}</span>`;
+    }
   }
 
   async function adminRefreshOnlineUsers(){
-    const status = $('adminOnlineStatus'), box = $('adminOnlineUsersTable'), sum = $('adminOnlineSummary');
-    if (status) status.textContent='Memuat user online...'; if (sum) sum.innerHTML='Memuat...';
+    const status = $('adminOnlineStatus');
+    const box = $('adminOnlineUsersTable');
+    const sum = $('adminOnlineSummary');
+    if (status) status.textContent='Memuat user online...';
+    if (sum) sum.innerHTML='Memuat...';
     try{
       const res = await apiCall('adminListOnlineUsers');
       const rows = Array.isArray(res) ? res : (res?.list || []);
@@ -1855,29 +2174,70 @@ body.dark .heroStripe{
       if (sum) sum.innerHTML = !rows.length ? '<span class="miniMuted">Tidak ada user online.</span>' : rows.slice(0,5).map(x=>`<div style="margin-bottom:8px;"><span class="pill">${escapeHtml(x.role||'')}</span><div style="margin-top:6px; font-weight:700;">${escapeHtml(x.nama||'')}</div><div class="miniMuted">${escapeHtml(x.nip||'')} • ${escapeHtml(x.lastSeen||'')}</div></div>`).join('');
       if (!box) return;
       box.innerHTML = !rows.length ? '<div class="hint">Tidak ada user online.</div>' : '<table><tr><th>NIP</th><th>Nama</th><th>Role</th><th>Last Seen</th></tr>' + rows.map(x=>`<tr><td>${escapeHtml(x.nip||'')}</td><td>${escapeHtml(x.nama||'')}</td><td>${escapeHtml(x.role||'')}</td><td>${escapeHtml(x.lastSeen||'')}</td></tr>`).join('') + '</table>';
-    }catch(err){ if (status) status.textContent='Error: ' + (err?.message || err); if (sum) sum.innerHTML=`<span class="miniMuted">Error: ${escapeHtml(err?.message || err)}</span>`; if (box) box.innerHTML=''; }
+    }catch(err){
+      if (status) status.textContent='Error: ' + (err?.message || err);
+      if (sum) sum.innerHTML=`<span class="miniMuted">Error: ${escapeHtml(err?.message || err)}</span>`;
+      if (box) box.innerHTML='';
+    }
   }
 
   async function adminRefreshNotifications(){
-    const status = $('adminNotifStatus'); if (status) status.textContent='Memuat inbox admin...';
+    const status = $('adminNotifStatus');
+    if (status) status.textContent='Memuat inbox admin...';
     try{
       const res = await apiCall('adminListNotifications');
       const rows = Array.isArray(res) ? res : (res?.list || []);
       if (status) status.textContent = `Total notifikasi: ${rows.length}`;
       renderAdminNotifications(rows);
-    }catch(err){ if (status) status.textContent = 'Error: ' + (err?.message || err); }
+    }catch(err){
+      if (status) status.textContent = 'Error: ' + (err?.message || err);
+    }
   }
+
   function renderAdminNotifications(list){
-    const box = $('adminNotifTable'); if (!box) return;
-    if (!list?.length){ box.innerHTML = '<div class="hint">Belum ada notifikasi masuk.</div>'; return; }
+    const box = $('adminNotifTable');
+    if (!box) return;
+    if (!list?.length){
+      box.innerHTML = '<div class="hint">Belum ada notifikasi masuk.</div>';
+      return;
+    }
     box.innerHTML = '<table><tr><th>Waktu</th><th>Judul</th><th>Pesan</th><th>Status</th><th>Link</th><th>Aksi</th></tr>' + list.map(x=>`<tr><td>${escapeHtml(x.timestamp||'')}</td><td>${escapeHtml(x.title||'')}</td><td style="white-space:pre-wrap;">${escapeHtml(x.message||'')}</td><td>${escapeHtml((x.isRead||'no') === 'yes' ? 'Dibaca' : 'Baru')}</td><td>${x.refId ? `<a href="${x.refId}" target="_blank" rel="noopener">Buka</a>` : '-'}</td><td><button type="button" class="secondary" style="margin-top:0; padding:6px 10px;" onclick="adminMarkNotificationRead('${String(x.notifId || '').replace(/'/g, "\\'")}')">Tandai Dibaca</button></td></tr>`).join('') + '</table>';
   }
+
   async function adminMarkNotificationRead(notifId){
-    try{ await apiCall('adminMarkNotificationRead', { notifId }); toast('Notifikasi ditandai sudah dibaca'); adminRefreshNotifications(); adminRefreshNotificationsQuick(); }
-    catch(err){ modalShow({ title:'Gagal', body: escapeHtml(err?.message || err) }); }
+    try{
+      await apiCall('adminMarkNotificationRead', { notifId });
+      toast('Notifikasi ditandai sudah dibaca');
+      adminRefreshNotifications();
+      adminRefreshNotificationsQuick();
+    } catch(err){
+      modalShow({ title:'Gagal', body: escapeHtml(err?.message || err) });
+    }
   }
+
   function adminClearNotifications(){
-    modalShow({ title:'Konfirmasi', body:'Hapus semua notifikasi inbox admin?', actions:[ { label:'Batal', kind:'secondary' }, { label:'Hapus Semua', kind:'danger', onClick: async ()=>{ toast('Menghapus notifikasi...'); try{ await apiCall('adminClearNotifications'); toast('Inbox admin berhasil dibersihkan'); adminRefreshNotifications(); adminRefreshNotificationsQuick(); }catch(err){ modalShow({ title:'Gagal', body: escapeHtml(err?.message || err) }); } } } ] });
+    modalShow({
+      title:'Konfirmasi',
+      body:'Hapus semua notifikasi inbox admin?',
+      actions:[
+        { label:'Batal', kind:'secondary' },
+        {
+          label:'Hapus Semua',
+          kind:'danger',
+          onClick: async ()=>{
+            toast('Menghapus notifikasi...');
+            try{
+              await apiCall('adminClearNotifications');
+              toast('Inbox admin berhasil dibersihkan');
+              adminRefreshNotifications();
+              adminRefreshNotificationsQuick();
+            }catch(err){
+              modalShow({ title:'Gagal', body: escapeHtml(err?.message || err) });
+            }
+          }
+        }
+      ]
+    });
   }
 
   async function adminLoadUsers(){
@@ -1887,320 +2247,668 @@ body.dark .heroStripe{
       const rows = Array.isArray(res) ? res : (res?.list || []);
       if ($('adminStatus')) $('adminStatus').textContent = `Total user: ${rows.length}`;
       renderAdminUsers(rows);
-    }catch(err){ if ($('adminStatus')) $('adminStatus').textContent = 'Error: ' + (err?.message || err); }
+    }catch(err){
+      if ($('adminStatus')) $('adminStatus').textContent = 'Error: ' + (err?.message || err);
+    }
   }
+
   function renderAdminUsers(list){
-    const box = $('adminUsersTable'); if (!box) return;
-    if (!list?.length){ box.innerHTML = '<div class="hint">Belum ada data pengguna.</div>'; return; }
+    const box = $('adminUsersTable');
+    if (!box) return;
+    if (!list?.length){
+      box.innerHTML = '<div class="hint">Belum ada data pengguna.</div>';
+      return;
+    }
     box.innerHTML = '<table><tr><th>Username</th><th>NIP</th><th>Nama</th><th>Email</th><th>Role Saat Ini</th><th>Ubah Role</th><th>Aksi</th></tr>' + list.map(u=>{
-      const rawUsername = String(u.username || ''), safeUsername = rawUsername.replace(/'/g, "\\'"), safeNip = String(u.nip || '').replace(/'/g, "\\'");
-      const currentRole = String(u.role || 'user').toLowerCase(), roleSelId = 'roleSel_' + rawUsername.replace(/[^a-zA-Z0-9_]/g, '_');
+      const rawUsername = String(u.username || '');
+      const safeUsername = rawUsername.replace(/'/g, "\\'");
+      const safeNip = String(u.nip || '').replace(/'/g, "\\'");
+      const currentRole = String(u.role || 'user').toLowerCase();
+      const roleSelId = 'roleSel_' + rawUsername.replace(/[^a-zA-Z0-9_]/g, '_');
       return `<tr><td>${escapeHtml(rawUsername)}</td><td>${escapeHtml(u.nip || '')}</td><td>${escapeHtml(u.nama || '')}</td><td>${escapeHtml(u.email || '')}</td><td>${escapeHtml(currentRole)}</td><td><div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;"><select id="${roleSelId}" style="min-width:140px;"><option value="user" ${currentRole==='user'?'selected':''}>user</option><option value="sekretaris" ${currentRole==='sekretaris'?'selected':''}>sekretaris</option><option value="admin" ${currentRole==='admin'?'selected':''}>admin</option></select><button type="button" class="secondary" style="margin-top:0; padding:6px 10px;" onclick="adminChangeRoleFromList('${safeUsername}')">Simpan Role</button></div></td><td><button type="button" class="secondary" style="margin-top:0; padding:6px 10px;" onclick="adminResetPassFromList('${safeUsername}')">Reset</button> <button type="button" class="danger" style="margin-top:0; padding:6px 10px;" onclick="adminDeleteUserFromList('${safeNip}')">Hapus</button></td></tr>`;
     }).join('') + '</table>';
   }
+
   async function adminChangeRoleFromList(username){
-    const elId = 'roleSel_' + String(username || '').replace(/[^a-zA-Z0-9_]/g, '_'); const role = document.getElementById(elId)?.value || 'user';
+    const elId = 'roleSel_' + String(username || '').replace(/[^a-zA-Z0-9_]/g, '_');
+    const role = document.getElementById(elId)?.value || 'user';
     toast('Menyimpan role...');
-    try{ await apiCall('adminUpdateUserRole', { username, role }); toast('Role berhasil diperbarui'); adminLoadUsers(); }
-    catch(err){ modalShow({ title:'Gagal ubah role', body: escapeHtml(err?.message || err) }); }
+    try{
+      await apiCall('adminUpdateUserRole', { username, role });
+      toast('Role berhasil diperbarui');
+      adminLoadUsers();
+    } catch(err){
+      modalShow({ title:'Gagal ubah role', body: escapeHtml(err?.message || err) });
+    }
   }
 
   async function adminCreateUser(){
-    const nama = ($('newUserNama')?.value || '').trim(), username = ($('newUserUsername')?.value || '').trim(), nip = ($('newUserNip')?.value || '').trim(), email = ($('newUserEmail')?.value || '').trim(), password = $('newUserPass')?.value || '', role = $('newUserRole')?.value || 'user';
+    const nama = ($('newUserNama')?.value || '').trim();
+    const username = ($('newUserUsername')?.value || '').trim();
+    const nip = ($('newUserNip')?.value || '').trim();
+    const email = ($('newUserEmail')?.value || '').trim();
+    const password = $('newUserPass')?.value || '';
+    const role = $('newUserRole')?.value || 'user';
+
     toast('Membuat user...');
     try{
       await apiCall('adminCreateUser', { nama, username, nip, email, password, role });
       toast('User berhasil dibuat');
-      ['newUserNama','newUserUsername','newUserNip','newUserEmail','newUserPass'].forEach(id=>{ if ($(id)) $(id).value=''; });
+      ['newUserNama','newUserUsername','newUserNip','newUserEmail','newUserPass'].forEach(id=>{
+        if ($(id)) $(id).value='';
+      });
       adminLoadUsers();
-    }catch(err){ modalShow({ title:'Error', body: escapeHtml(err?.message || err) }); }
+    }catch(err){
+      modalShow({ title:'Error', body: escapeHtml(err?.message || err) });
+    }
   }
+
   function adminResetPassFromList(username){
-    modalShow({ title:'Reset Password', body:`<div class="hint">Reset password untuk username: <b>${escapeHtml(username)}</b></div><label for="rpNewPass">Password Baru</label><input id="rpNewPass" type="password" placeholder="Masukkan password baru">`, actions:[ { label:'Batal', kind:'secondary' }, { label:'Reset', onClick: async ()=>{ const pass = $('rpNewPass')?.value || ''; toast('Mereset password...'); try{ await apiCall('adminResetPassword', { username, newPassword: pass }); toast('Password berhasil direset'); adminLoadUsers(); }catch(err){ modalShow({ title:'Error', body: escapeHtml(err?.message || err) }); } } } ] });
+    modalShow({
+      title:'Reset Password',
+      body:`<div class="hint">Reset password untuk username: <b>${escapeHtml(username)}</b></div><label for="rpNewPass">Password Baru</label><input id="rpNewPass" type="password" placeholder="Masukkan password baru">`,
+      actions:[
+        { label:'Batal', kind:'secondary' },
+        {
+          label:'Reset',
+          onClick: async ()=>{
+            const pass = $('rpNewPass')?.value || '';
+            toast('Mereset password...');
+            try{
+              await apiCall('adminResetPassword', { username, newPassword: pass });
+              toast('Password berhasil direset');
+              adminLoadUsers();
+            }catch(err){
+              modalShow({ title:'Error', body: escapeHtml(err?.message || err) });
+            }
+          }
+        }
+      ]
+    });
   }
+
   function adminDeleteUserFromList(nipOrUsername){
-    modalShow({ title:'Konfirmasi', body:`Hapus user <b>${escapeHtml(nipOrUsername)}</b>?`, actions:[ { label:'Batal', kind:'secondary' }, { label:'Hapus', kind:'danger', onClick: async ()=>{ toast('Menghapus user...'); try{ await apiCall('adminDeleteUser', { nip: nipOrUsername }); toast('User berhasil dihapus'); adminLoadUsers(); }catch(err){ modalShow({ title:'Error', body: escapeHtml(err?.message || err) }); } } } ] });
+    modalShow({
+      title:'Konfirmasi',
+      body:`Hapus user <b>${escapeHtml(nipOrUsername)}</b>?`,
+      actions:[
+        { label:'Batal', kind:'secondary' },
+        {
+          label:'Hapus',
+          kind:'danger',
+          onClick: async ()=>{
+            toast('Menghapus user...');
+            try{
+              await apiCall('adminDeleteUser', { nip: nipOrUsername });
+              toast('User berhasil dihapus');
+              adminLoadUsers();
+            }catch(err){
+              modalShow({ title:'Error', body: escapeHtml(err?.message || err) });
+            }
+          }
+        }
+      ]
+    });
   }
 
   async function adminRefreshUploadRoot(){
-    const hint = $('uploadRootHint'); if (hint) hint.textContent = 'Memuat root folder...';
+    const hint = $('uploadRootHint');
+    if (hint) hint.textContent = 'Memuat root folder...';
     try{
       const res = await apiCall('adminGetUploadRoot');
       if ($('uploadRootId')) $('uploadRootId').value = res?.folderId || '';
       if (hint) hint.innerHTML = res?.url ? `Root aktif: <a href="${res.url}" target="_blank" rel="noopener">${res.url}</a>` : '';
-    }catch(err){ if (hint) hint.textContent = 'Error: ' + (err?.message || err); }
+    }catch(err){
+      if (hint) hint.textContent = 'Error: ' + (err?.message || err);
+    }
   }
+
   async function adminSaveUploadRoot(){
     const id = ($('uploadRootId')?.value || '').trim();
-    if (!id){ toast('Isi Folder ID terlebih dahulu'); return; }
+    if (!id){
+      toast('Isi Folder ID terlebih dahulu');
+      return;
+    }
     toast('Menyimpan root folder...');
-    try{ await apiCall('adminSetUploadRootFolder', { urlOrId: id }); toast('Root folder berhasil disimpan'); adminRefreshUploadRoot(); adminRefreshUploadFolders(); refreshUploadFolders(); }
-    catch(err){ modalShow({ title:'Gagal', body: escapeHtml(err?.message || err) }); }
+    try{
+      await apiCall('adminSetUploadRootFolder', { urlOrId: id });
+      toast('Root folder berhasil disimpan');
+      adminRefreshUploadRoot();
+      adminRefreshUploadFolders();
+      refreshUploadFolders();
+    } catch(err){
+      modalShow({ title:'Gagal', body: escapeHtml(err?.message || err) });
+    }
   }
+
   async function adminCreateUploadFolder(){
     const name = ($('newUploadFolderName')?.value || '').trim();
-    if (!name){ toast('Isi nama folder terlebih dahulu'); return; }
+    if (!name){
+      toast('Isi nama folder terlebih dahulu');
+      return;
+    }
     toast('Membuat folder...');
-    try{ await apiCall('adminCreateUploadFolder', { name }); toast('Folder upload berhasil dibuat'); if ($('newUploadFolderName')) $('newUploadFolderName').value = ''; adminRefreshUploadFolders(); refreshUploadFolders(); }
-    catch(err){ modalShow({ title:'Gagal buat folder', body: escapeHtml(err?.message || err) }); }
+    try{
+      await apiCall('adminCreateUploadFolder', { name });
+      toast('Folder upload berhasil dibuat');
+      if ($('newUploadFolderName')) $('newUploadFolderName').value = '';
+      adminRefreshUploadFolders();
+      refreshUploadFolders();
+    } catch(err){
+      modalShow({ title:'Gagal buat folder', body: escapeHtml(err?.message || err) });
+    }
   }
+
   async function adminRefreshUploadFolders(){
-    const status = $('adminUploadStatus'); if (status) status.textContent='Memuat daftar folder upload...';
+    const status = $('adminUploadStatus');
+    if (status) status.textContent='Memuat daftar folder upload...';
     try{
       const res = await apiCall('adminListUploadFolders');
       const rows = Array.isArray(res) ? res : (res?.list || []);
       if (status) status.textContent = `Total folder: ${rows.length}`;
-      renderAdminUploadFolders(rows); refreshUploadFolders();
-    }catch(err){ if (status) status.textContent = 'Error: ' + (err?.message || err); }
+      renderAdminUploadFolders(rows);
+      refreshUploadFolders();
+    }catch(err){
+      if (status) status.textContent = 'Error: ' + (err?.message || err);
+    }
   }
+
   function renderAdminUploadFolders(list){
-    const box = $('adminUploadFoldersTable'); if (!box) return;
-    if (!list?.length){ box.innerHTML = '<div class="hint">Belum ada folder upload.</div>'; return; }
+    const box = $('adminUploadFoldersTable');
+    if (!box) return;
+    if (!list?.length){
+      box.innerHTML = '<div class="hint">Belum ada folder upload.</div>';
+      return;
+    }
     box.innerHTML = '<table><tr><th>Nama Folder</th><th>Folder ID</th><th>Dibuat</th><th>Link</th><th>Aksi</th></tr>' + list.map(x=>`<tr><td>${escapeHtml(x.name||'')}</td><td>${escapeHtml(x.folderId||'')}</td><td>${escapeHtml(x.created||'')}</td><td><a href="${x.url}" target="_blank" rel="noopener">Buka Folder</a></td><td><button type="button" class="danger" style="margin-top:0; padding:6px 10px;" onclick="adminDeleteUploadFolder('${String(x.folderId || '').replace(/'/g, "\\'")}')">Hapus</button></td></tr>`).join('') + '</table>';
   }
+
   function adminDeleteUploadFolder(folderId){
-    modalShow({ title:'Konfirmasi', body:`Folder upload ini akan dipindahkan ke Trash Google Drive.<br><br><b>${escapeHtml(folderId)}</b>`, actions:[ { label:'Batal', kind:'secondary' }, { label:'Hapus', kind:'danger', onClick: async ()=>{ toast('Menghapus folder...'); try{ await apiCall('adminDeleteUploadFolder', { folderId }); toast('Folder berhasil dihapus'); adminRefreshUploadFolders(); refreshUploadFolders(); }catch(err){ modalShow({ title:'Gagal', body: escapeHtml(err?.message || err) }); } } } ] });
+    modalShow({
+      title:'Konfirmasi',
+      body:`Folder upload ini akan dipindahkan ke Trash Google Drive.<br><br><b>${escapeHtml(folderId)}</b>`,
+      actions:[
+        { label:'Batal', kind:'secondary' },
+        {
+          label:'Hapus',
+          kind:'danger',
+          onClick: async ()=>{
+            toast('Menghapus folder...');
+            try{
+              await apiCall('adminDeleteUploadFolder', { folderId });
+              toast('Folder berhasil dihapus');
+              adminRefreshUploadFolders();
+              refreshUploadFolders();
+            }catch(err){
+              modalShow({ title:'Gagal', body: escapeHtml(err?.message || err) });
+            }
+          }
+        }
+      ]
+    });
   }
 
   async function adminRefreshLogs(){
-    const status = $('adminLogsStatus'); if (status) status.textContent='Memuat log aktivitas...';
+    const status = $('adminLogsStatus');
+    if (status) status.textContent='Memuat log aktivitas...';
     try{
       const res = await apiCall('adminListLogs', { limit: 500 });
       const rows = Array.isArray(res) ? res : (res?.list || []);
       if (status) status.textContent = `Total log tampil: ${rows.length}`;
       renderAdminLogs(rows);
-    }catch(err){ if (status) status.textContent = 'Error: ' + (err?.message || err); }
+    }catch(err){
+      if (status) status.textContent = 'Error: ' + (err?.message || err);
+    }
   }
+
   function renderAdminLogs(list){
-    const box = $('adminLogsTable'); if (!box) return;
-    if (!list?.length){ box.innerHTML = '<div class="hint">Belum ada log aktivitas.</div>'; return; }
+    const box = $('adminLogsTable');
+    if (!box) return;
+    if (!list?.length){
+      box.innerHTML = '<div class="hint">Belum ada log aktivitas.</div>';
+      return;
+    }
     box.innerHTML = '<table><tr><th>Waktu</th><th>User</th><th>Role</th><th>Aksi</th><th>Detail</th><th>Hapus</th></tr>' + list.map(x=>`<tr><td>${escapeHtml(x.time||'')}</td><td>${escapeHtml((x.nama||'') + ' (' + (x.nip||'') + ')')}</td><td>${escapeHtml(x.role||'')}</td><td>${escapeHtml(x.action||'')}</td><td style="max-width:420px; white-space:pre-wrap;">${escapeHtml(x.detail||'')}</td><td><button type="button" class="danger" style="margin-top:0; padding:6px 10px;" onclick="adminDeleteLog(${Number(x.rowNum || 0)})">Hapus</button></td></tr>`).join('') + '</table>';
   }
+
   async function adminDeleteLog(logRowNum){
-    try{ await apiCall('adminDeleteLogs', { rowNums:[Number(logRowNum)] }); toast('Log berhasil dihapus'); adminRefreshLogs(); }
-    catch(err){ modalShow({ title:'Gagal', body: escapeHtml(err?.message || err) }); }
+    try{
+      await apiCall('adminDeleteLogs', { rowNums:[Number(logRowNum)] });
+      toast('Log berhasil dihapus');
+      adminRefreshLogs();
+    } catch(err){
+      modalShow({ title:'Gagal', body: escapeHtml(err?.message || err) });
+    }
   }
+
   function adminClearLogs(){
-    modalShow({ title:'Konfirmasi', body:'Hapus semua log aktivitas?', actions:[ { label:'Batal', kind:'secondary' }, { label:'Hapus Semua', kind:'danger', onClick: async ()=>{ toast('Menghapus semua log...'); try{ await apiCall('adminClearLogs', {}); toast('Semua log berhasil dihapus'); adminRefreshLogs(); }catch(err){ modalShow({ title:'Gagal', body: escapeHtml(err?.message || err) }); } } } ] });
+    modalShow({
+      title:'Konfirmasi',
+      body:'Hapus semua log aktivitas?',
+      actions:[
+        { label:'Batal', kind:'secondary' },
+        {
+          label:'Hapus Semua',
+          kind:'danger',
+          onClick: async ()=>{
+            toast('Menghapus semua log...');
+            try{
+              await apiCall('adminClearLogs', {});
+              toast('Semua log berhasil dihapus');
+              adminRefreshLogs();
+            }catch(err){
+              modalShow({ title:'Gagal', body: escapeHtml(err?.message || err) });
+            }
+          }
+        }
+      ]
+    });
   }
 
   function toast(msg, ms=2200){
     const el = $('toast');
-    if (!el){ alert(msg || ''); return; }
-    el.textContent = msg || ''; el.classList.remove('hidden');
-    clearTimeout(window.__toastT); window.__toastT = setTimeout(()=> el.classList.add('hidden'), ms);
+    if (!el){
+      alert(msg || '');
+      return;
+    }
+    el.textContent = msg || '';
+    el.classList.remove('hidden');
+    clearTimeout(window.__toastT);
+    window.__toastT = setTimeout(()=> el.classList.add('hidden'), ms);
   }
 
   function modalShow({ title='Informasi', body='', actions=[] }){
-    const m = $('modal'), card = $('modalCard');
-    if (!m || !card){ alert(title + '\n\n' + String(body || '').replace(/<[^>]*>/g,'')); return; }
+    const m = $('modal');
+    const card = $('modalCard');
+    if (!m || !card){
+      alert(title + '\n\n' + String(body || '').replace(/<[^>]*>/g,''));
+      return;
+    }
     if ($('modalTitle')) $('modalTitle').textContent = title;
     if ($('modalBody')) $('modalBody').innerHTML = body;
-    const act = $('modalActions'); if (act) act.innerHTML = '';
-    actions.forEach(a=>{ const btn = document.createElement('button'); btn.type='button'; btn.textContent=a.label; btn.className = a.kind === 'secondary' ? 'secondary' : (a.kind === 'danger' ? 'danger' : ''); btn.onclick = ()=>{ modalHide(); if (typeof a.onClick === 'function') a.onClick(); }; act.appendChild(btn); });
-    if (!actions.length){ const btn = document.createElement('button'); btn.type='button'; btn.textContent='Tutup'; btn.className='secondary'; btn.onclick = modalHide; act.appendChild(btn); }
-    m.classList.remove('hidden'); m.style.display='flex';
-    $('modalCloseBtn').onclick = modalHide;
+    const act = $('modalActions');
+    if (act) act.innerHTML = '';
+
+    actions.forEach(a=>{
+      const btn = document.createElement('button');
+      btn.type='button';
+      btn.textContent=a.label;
+      btn.className = a.kind === 'secondary' ? 'secondary' : (a.kind === 'danger' ? 'danger' : '');
+      btn.onclick = ()=>{
+        modalHide();
+        if (typeof a.onClick === 'function') a.onClick();
+      };
+      act.appendChild(btn);
+    });
+
+    if (!actions.length){
+      const btn = document.createElement('button');
+      btn.type='button';
+      btn.textContent='Tutup';
+      btn.className='secondary';
+      btn.onclick = modalHide;
+      act.appendChild(btn);
+    }
+
+    m.classList.remove('hidden');
+    m.style.display='flex';
+    if ($('modalCloseBtn')) $('modalCloseBtn').onclick = modalHide;
     m.onclick = (ev)=>{ if (ev.target === m) modalHide(); };
     card.onclick = (ev)=> ev.stopPropagation();
   }
+
   function modalHide(){
-    const m = $('modal'); if (!m) return;
-    m.classList.add('hidden'); m.style.display='none'; m.onclick=null;
+    const m = $('modal');
+    if (!m) return;
+    m.classList.add('hidden');
+    m.style.display='none';
+    m.onclick=null;
     if ($('modalCard')) $('modalCard').onclick = null;
     if ($('modalCloseBtn')) $('modalCloseBtn').onclick = null;
   }
 
   async function refreshDrafts(){
-    const sel = $('draftSelect'); if (!sel) return; sel.innerHTML = '';
+    const sel = $('draftSelect');
+    if (!sel) return;
+    sel.innerHTML = '';
     try{
       const res = await apiCall('listLhkDrafts');
       const rows = Array.isArray(res) ? res : (res?.list || []);
-      if (!rows.length){ const o=document.createElement('option'); o.value=''; o.textContent='(Belum ada draft)'; sel.appendChild(o); return; }
-      rows.forEach(d=>{ const o=document.createElement('option'); o.value=d.fileId; o.textContent=`${d.name} — ${d.created}`; sel.appendChild(o); });
-    }catch(err){ modalShow({ title:'Error', body: escapeHtml(err?.message || err) }); }
+      if (!rows.length){
+        const o=document.createElement('option');
+        o.value='';
+        o.textContent='(Belum ada draft)';
+        sel.appendChild(o);
+        return;
+      }
+      rows.forEach(d=>{
+        const o=document.createElement('option');
+        o.value=d.fileId;
+        o.textContent=`${d.name} — ${d.created}`;
+        sel.appendChild(o);
+      });
+    }catch(err){
+      modalShow({ title:'Error', body: escapeHtml(err?.message || err) });
+    }
   }
 
   async function saveDraft(){
     toast('Menyimpan draft...');
-    try{ await apiCall('saveLhkDraft', getFormData()); toast('Draft berhasil disimpan'); refreshDrafts(); }
-    catch(err){ modalShow({ title:'Gagal simpan draft', body: escapeHtml(err?.message || err) }); }
+    try{
+      await apiCall('saveLhkDraft', getFormData());
+      toast('Draft berhasil disimpan');
+      refreshDrafts();
+    } catch(err){
+      modalShow({ title:'Gagal simpan draft', body: escapeHtml(err?.message || err) });
+    }
   }
+
   async function loadDraft(){
     const id = $('draftSelect')?.value || '';
-    if (!id){ modalShow({ title:'Informasi', body:'Pilih draft terlebih dahulu.' }); return; }
+    if (!id){
+      modalShow({ title:'Informasi', body:'Pilih draft terlebih dahulu.' });
+      return;
+    }
     toast('Memuat draft...');
-    try{ const res = await apiCall('loadLhkDraft', { fileId:id }); applyDraftToForm(res?.draft || {}); updateHolidayPlaceholder(false); toast('Draft berhasil dimuat'); }
-    catch(err){ modalShow({ title:'Gagal muat draft', body: escapeHtml(err?.message || err) }); }
+    try{
+      const res = await apiCall('loadLhkDraft', { fileId:id });
+      applyDraftToForm(res?.draft || {});
+      updateHolidayPlaceholder(false);
+      toast('Draft berhasil dimuat');
+    } catch(err){
+      modalShow({ title:'Gagal muat draft', body: escapeHtml(err?.message || err) });
+    }
   }
+
   function deleteDraft(){
     const id = $('draftSelect')?.value || '';
-    if (!id){ modalShow({ title:'Informasi', body:'Pilih draft terlebih dahulu.' }); return; }
-    modalShow({ title:'Konfirmasi', body:'Hapus draft terpilih?', actions:[ { label:'Batal', kind:'secondary' }, { label:'Hapus', kind:'danger', onClick: async ()=>{ try{ await apiCall('deleteLhkDraft', { fileId:id }); toast('Draft berhasil dihapus'); refreshDrafts(); }catch(err){ modalShow({ title:'Gagal hapus draft', body: escapeHtml(err?.message || err) }); } } } ] });
+    if (!id){
+      modalShow({ title:'Informasi', body:'Pilih draft terlebih dahulu.' });
+      return;
+    }
+    modalShow({
+      title:'Konfirmasi',
+      body:'Hapus draft terpilih?',
+      actions:[
+        { label:'Batal', kind:'secondary' },
+        {
+          label:'Hapus',
+          kind:'danger',
+          onClick: async ()=>{
+            try{
+              await apiCall('deleteLhkDraft', { fileId:id });
+              toast('Draft berhasil dihapus');
+              refreshDrafts();
+            }catch(err){
+              modalShow({ title:'Gagal hapus draft', body: escapeHtml(err?.message || err) });
+            }
+          }
+        }
+      ]
+    });
   }
 
   function applyDraftToForm(d){
-    const setVal = (id, val)=>{ if ($(id)) $(id).value = val ?? ''; };
-    ['subBagian','jabatan','jabatanPembuat','month','year','kota','holidays','fontOut','fontIn','jabatanAtasan','namaAtasan','nipAtasan','colorHeader','colorDateCol','colorOffRow','enableOffHighlight','showSubHead','showKet','hideSaturday','hideSunday','signatureMode','pdfMode'].forEach(id=>setVal(id, d[id] ?? $(id)?.value ?? ''));
-    setVal('month', String(d.month || '')); setVal('year', String(d.year || '')); setVal('fontOut', String(d.fontOut || '12')); setVal('fontIn', String(d.fontIn || '12'));
-    setVal('colorHeader', d.colorHeader || '#dbeafe'); setVal('colorDateCol', d.colorDateCol || '#f3f4f6'); setVal('colorOffRow', d.colorOffRow || '#fef3c7');
-    sigPembuatB64 = d.sigPembuatB64 || ''; sigAtasanB64 = d.sigAtasanB64 || ''; currentDays = Array.isArray(d.days) ? d.days : [];
-    window.__lastPeriodMonth = Number(d.month || 0); window.__lastPeriodYear = Number(d.year || 0);
-    bindColorPreview('colorHeader', 'previewColorHeader'); bindColorPreview('colorDateCol', 'previewColorDateCol'); bindColorPreview('colorOffRow', 'previewColorOffRow');
-    syncAtasanNip(); applySignatureModeUI(); updateHolidayPlaceholder(false);
+    const setVal = (id, val)=>{
+      if ($(id)) $(id).value = val ?? '';
+    };
+
+    ['subBagian','jabatan','jabatanPembuat','month','year','kota','holidays','fontOut','fontIn','jabatanAtasan','colorHeader','colorDateCol','colorOffRow','enableOffHighlight','showSubHead','showKet','hideSaturday','hideSunday','signatureMode','pdfMode'].forEach(id=>{
+      setVal(id, d[id] ?? $(id)?.value ?? '');
+    });
+
+    setVal('month', String(d.month || ''));
+    setVal('year', String(d.year || ''));
+    setVal('fontOut', String(d.fontOut || '12'));
+    setVal('fontIn', String(d.fontIn || '12'));
+    setVal('colorHeader', d.colorHeader || '#dbeafe');
+    setVal('colorDateCol', d.colorDateCol || '#f3f4f6');
+    setVal('colorOffRow', d.colorOffRow || '#fef3c7');
+
+    fillAtasanByJabatan(d.namaAtasan || '');
+    syncAtasanNip();
+
+    sigPembuatB64 = d.sigPembuatB64 || '';
+    sigAtasanB64 = d.sigAtasanB64 || '';
+    currentDays = Array.isArray(d.days) ? d.days : [];
+
+    window.__lastPeriodMonth = Number(d.month || 0);
+    window.__lastPeriodYear = Number(d.year || 0);
+
+    bindColorPreview('colorHeader', 'previewColorHeader');
+    bindColorPreview('colorDateCol', 'previewColorDateCol');
+    bindColorPreview('colorOffRow', 'previewColorOffRow');
+
+    applySignatureModeUI();
+    updateHolidayPlaceholder(false);
   }
 
   function openRegister(){
-    modalShow({ title:'Daftar Akun Baru', body:`<div class="hint" style="margin-bottom:10px">Akun yang didaftarkan dari sini otomatis memiliki role <b>user</b>.</div><label for="regNama">Nama</label><input id="regNama" placeholder="Masukkan nama lengkap"><label for="regUsername">Username</label><input id="regUsername" placeholder="Masukkan username login"><label for="regNip">NIP</label><input id="regNip" placeholder="Masukkan NIP"><label for="regEmail">Email</label><input id="regEmail" type="email" placeholder="user@domain.com"><label for="regPass">Password</label><input id="regPass" type="password" placeholder="Masukkan password">`, actions:[ { label:'Batal', kind:'secondary' }, { label:'Daftar', onClick: async ()=>{ const nama=($('regNama')?.value||'').trim(), username=($('regUsername')?.value||'').trim(), nip=($('regNip')?.value||'').trim(), email=($('regEmail')?.value||'').trim(), password=$('regPass')?.value||''; toast('Mendaftarkan akun...'); try{ await apiCall('registerUser', { nama, username, nip, email, password }, ''); toast('Pendaftaran berhasil. Silakan login.'); }catch(err){ modalShow({ title:'Pendaftaran gagal', body: escapeHtml(err?.message || err) }); } } } ] });
+    modalShow({
+      title:'Daftar Akun Baru',
+      body:`<div class="hint" style="margin-bottom:10px">Akun yang didaftarkan dari sini otomatis memiliki role <b>user</b>.</div><label for="regNama">Nama</label><input id="regNama" placeholder="Masukkan nama lengkap"><label for="regUsername">Username</label><input id="regUsername" placeholder="Masukkan username login"><label for="regNip">NIP</label><input id="regNip" placeholder="Masukkan NIP"><label for="regEmail">Email</label><input id="regEmail" type="email" placeholder="user@domain.com"><label for="regPass">Password</label><input id="regPass" type="password" placeholder="Masukkan password">`,
+      actions:[
+        { label:'Batal', kind:'secondary' },
+        {
+          label:'Daftar',
+          onClick: async ()=>{
+            const nama=($('regNama')?.value||'').trim();
+            const username=($('regUsername')?.value||'').trim();
+            const nip=($('regNip')?.value||'').trim();
+            const email=($('regEmail')?.value||'').trim();
+            const password=$('regPass')?.value||'';
+            toast('Mendaftarkan akun...');
+            try{
+              await apiCall('registerUser', { nama, username, nip, email, password }, '');
+              toast('Pendaftaran berhasil. Silakan login.');
+            }catch(err){
+              modalShow({ title:'Pendaftaran gagal', body: escapeHtml(err?.message || err) });
+            }
+          }
+        }
+      ]
+    });
   }
 
   function openForgot(){
-    bumpAuthNonce(); toast('Membuka reset password...');
-    stopHeartbeat(); if (window.__syncTimer) { clearInterval(window.__syncTimer); window.__syncTimer = null; }
-    token=''; sessionUser=null; currentDays=[]; saveTokenLocal('');
-    try { $('loginPass').value = ''; } catch(e){}
+    bumpAuthNonce();
+    toast('Membuka reset password...');
+    stopHeartbeat();
+    if (window.__syncTimer) {
+      clearInterval(window.__syncTimer);
+      window.__syncTimer = null;
+    }
+    token='';
+    sessionUser=null;
+    currentDays=[];
+    saveTokenLocal('');
+    try { if ($('loginPass')) $('loginPass').value = ''; } catch(e){}
     showLogin();
-    modalShow({ title:'Lupa Password', body:`<div class="hint" style="margin-bottom:10px">Masukkan NIP. Kode reset akan dikirim ke email yang terdaftar.</div><label for="fpNip">NIP</label><input id="fpNip" value=""><label for="fpCode">Kode Reset (6 digit)</label><input id="fpCode" placeholder="Contoh: 123456"><label for="fpNewPass">Password Baru</label><input id="fpNewPass" type="password"><div class="hint">Klik "Kirim Kode", lalu isi kode dan password baru, kemudian klik "Reset".</div>`, actions:[ { label:'Tutup', kind:'secondary' }, { label:'Kirim Kode', kind:'secondary', onClick: async ()=>{ const n = ($('fpNip')?.value || '').trim(); toast('Mengirim kode reset...'); try{ const res = await apiCall('requestPasswordReset', { nip:n }, ''); modalShow({ title:'Informasi', body: escapeHtml(res?.message || 'Jika terdaftar, kode akan dikirim.') }); }catch(err){ modalShow({ title:'Gagal kirim kode', body: escapeHtml(err?.message || err) }); } } }, { label:'Reset', onClick: async ()=>{ const n = ($('fpNip')?.value || '').trim(), c = ($('fpCode')?.value || '').trim(), p = $('fpNewPass')?.value || ''; toast('Mereset password...'); try{ await apiCall('resetPasswordWithCode', { nip:n, code:c, newPassword:p }, ''); modalShow({ title:'Sukses', body:'Password berhasil direset. Silakan login kembali.' }); }catch(err){ modalShow({ title:'Gagal reset', body: escapeHtml(err?.message || err) }); } } } ] });
+
+    modalShow({
+      title:'Lupa Password',
+      body:`<div class="hint" style="margin-bottom:10px">Masukkan NIP. Kode reset akan dikirim ke email yang terdaftar.</div><label for="fpNip">NIP</label><input id="fpNip" value=""><label for="fpCode">Kode Reset (6 digit)</label><input id="fpCode" placeholder="Contoh: 123456"><label for="fpNewPass">Password Baru</label><input id="fpNewPass" type="password"><div class="hint">Klik "Kirim Kode", lalu isi kode dan password baru, kemudian klik "Reset".</div>`,
+      actions:[
+        { label:'Tutup', kind:'secondary' },
+        {
+          label:'Kirim Kode',
+          kind:'secondary',
+          onClick: async ()=>{
+            const n = ($('fpNip')?.value || '').trim();
+            toast('Mengirim kode reset...');
+            try{
+              const res = await apiCall('requestPasswordReset', { nip:n }, '');
+              modalShow({ title:'Informasi', body: escapeHtml(res?.message || 'Jika terdaftar, kode akan dikirim.') });
+            }catch(err){
+              modalShow({ title:'Gagal kirim kode', body: escapeHtml(err?.message || err) });
+            }
+          }
+        },
+        {
+          label:'Reset',
+          onClick: async ()=>{
+            const n = ($('fpNip')?.value || '').trim();
+            const c = ($('fpCode')?.value || '').trim();
+            const p = $('fpNewPass')?.value || '';
+            toast('Mereset password...');
+            try{
+              await apiCall('resetPasswordWithCode', { nip:n, code:c, newPassword:p }, '');
+              modalShow({ title:'Sukses', body:'Password berhasil direset. Silakan login kembali.' });
+            }catch(err){
+              modalShow({ title:'Gagal reset', body: escapeHtml(err?.message || err) });
+            }
+          }
+        }
+      ]
+    });
   }
 
   function applySignatureModeUI(){
-    const mode = $('signatureMode')?.value || 'text'; const row = $('sigUploadRow'); if (!row) return;
-    if (mode === 'image') row.classList.remove('hidden');
-    else { row.classList.add('hidden'); sigPembuatB64=''; sigAtasanB64=''; if ($('sigPembuatFile')) $('sigPembuatFile').value=''; if ($('sigAtasanFile')) $('sigAtasanFile').value=''; }
+    const mode = $('signatureMode')?.value || 'text';
+    const row = $('sigUploadRow');
+    if (!row) return;
+    if (mode === 'image') {
+      row.classList.remove('hidden');
+    } else {
+      row.classList.add('hidden');
+      sigPembuatB64='';
+      sigAtasanB64='';
+      if ($('sigPembuatFile')) $('sigPembuatFile').value='';
+      if ($('sigAtasanFile')) $('sigAtasanFile').value='';
+    }
   }
 
-  function escapeHtml(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c])); }
-  function finishBoot(){ document.body.classList.remove('booting'); }
+  function escapeHtml(s){
+    return String(s ?? '').replace(/[&<>"']/g, c => ({
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      '"':'&quot;',
+      "'":'&#39;'
+    }[c]));
+  }
+
+  function finishBoot(){
+    document.body.classList.remove('booting');
+  }
 
   async function printPreview(){
-    resetCurrentDaysIfPeriodChanged(); setStatus('Menyiapkan tampilan print...');
-    const form = getFormData(); form.exportMode = true;
+    resetCurrentDaysIfPeriodChanged();
+    setStatus('Menyiapkan tampilan print...');
+    const form = getFormData();
+    form.exportMode = true;
     try{
       const res = await apiCall('renderPreviewHtml', form);
       const cleanHtml = (res && typeof res === 'object' && 'html' in res) ? res.html : res;
       const w = window.open('', '_blank');
-      if (!w){ modalShow({ title:'Print tidak tersedia', body:'Popup diblokir browser. Izinkan popup lalu coba lagi.' }); return; }
-      w.document.open(); w.document.write(cleanHtml); w.document.close();
-      w.onload = () => { w.focus(); w.print(); };
+      if (!w){
+        modalShow({ title:'Print tidak tersedia', body:'Popup diblokir browser. Izinkan popup lalu coba lagi.' });
+        return;
+      }
+      w.document.open();
+      w.document.write(cleanHtml);
+      w.document.close();
+      w.onload = () => {
+        w.focus();
+        w.print();
+      };
       setStatus('Tampilan print siap.');
-    }catch(err){ setStatus('Error: ' + (err?.message || err)); }
-  }
-
-  // ===== THEME TOGGLE =====
-const THEME_KEY = 'lhk_theme';
-
-function applyTheme(theme){
-  if (theme === 'dark'){
-    document.body.classList.add('dark');
-    const btn = document.getElementById('btnToggleTheme');
-    if (btn) btn.textContent = '☀️ Mode Terang';
-  } else {
-    document.body.classList.remove('dark');
-    const btn = document.getElementById('btnToggleTheme');
-    if (btn) btn.textContent = '🌙 Mode Gelap';
-  }
-}
-
-function toggleTheme(){
-  const isDark = document.body.classList.contains('dark');
-  const next = isDark ? 'light' : 'dark';
-  localStorage.setItem(THEME_KEY, next);
-  applyTheme(next);
-}
-
-function loadTheme(){
-  const saved = localStorage.getItem(THEME_KEY) || 'light';
-  applyTheme(saved);
-}
-
-window.addEventListener('load', ()=>{
-  bindLoginEnterBehavior();
-  loadTheme();
-  $('btnToggleTheme')?.addEventListener('click', toggleTheme);
-
-  $('loginView')?.classList.add('hidden');
-  $('appView')?.classList.add('hidden');
-
-  $('btnLogin')?.addEventListener('click', (e)=>{
-    e.preventDefault();
-    doLogin();
-  });
-
-  $('btnForgot')?.addEventListener('click', (e)=>{
-    e.preventDefault();
-    openForgot();
-  });
-
-  $('btnRegister')?.addEventListener('click', (e)=>{
-    e.preventDefault();
-    openRegister();
-  });
-
-  document.querySelectorAll('.tab[data-tab]').forEach(el=>{
-    el.addEventListener('click', ()=>{
-      showTab(el.getAttribute('data-tab'));
-    });
-  });
-
-  $('btnPreview')?.addEventListener('click', generatePreview);
-  $('btnPreviewMobile')?.addEventListener('click', generatePreview);
-  $('btnDownload')?.addEventListener('click', downloadPdf);
-  $('btnDownloadMobile')?.addEventListener('click', downloadPdf);
-  $('btnDownloadExcel')?.addEventListener('click', downloadExcel);
-  $('btnPrint')?.addEventListener('click', printPreview);
-  $('btnLogout')?.addEventListener('click', doLogout);
-
-  $('btnRefreshDrafts')?.addEventListener('click', refreshDrafts);
-  $('btnSaveDraft')?.addEventListener('click', saveDraft);
-  $('btnLoadDraft')?.addEventListener('click', loadDraft);
-  $('btnDeleteDraft')?.addEventListener('click', deleteDraft);
-
-  $('btnRefreshFiles')?.addEventListener('click', refreshFiles);
-  $('btnOpenFolder')?.addEventListener('click', openFolder);
-
-  $('btnUploadLhk')?.addEventListener('click', uploadLhk);
-  $('btnChangePass')?.addEventListener('click', changePassword);
-  $('btnChangeEmail')?.addEventListener('click', changeEmail);
-
-  $('btnAdminRefreshNotifications')?.addEventListener('click', ()=>{
-    adminRefreshNotifications();
-    adminRefreshNotificationsQuick();
-  });
-  $('btnAdminClearNotifications')?.addEventListener('click', adminClearNotifications);
-  $('btnAdminRefreshOnlineUsers')?.addEventListener('click', adminRefreshOnlineUsers);
-  $('btnAdminLoadUsers')?.addEventListener('click', adminLoadUsers);
-  $('btnAdminCreateUser')?.addEventListener('click', adminCreateUser);
-
-  $('btnAdminSaveUploadRoot')?.addEventListener('click', adminSaveUploadRoot);
-  $('btnAdminCreateUploadFolder')?.addEventListener('click', adminCreateUploadFolder);
-  $('btnAdminRefreshUploadFolders')?.addEventListener('click', adminRefreshUploadFolders);
-
-  $('btnAdminRefreshLogs')?.addEventListener('click', adminRefreshLogs);
-  $('btnAdminClearLogs')?.addEventListener('click', adminClearLogs);
-
-  document.addEventListener('keydown', (e)=>{
-    if (e.key === 'Escape'){
-      const m = $('modal');
-      if (m && !m.classList.contains('hidden')) modalHide();
+    }catch(err){
+      setStatus('Error: ' + (err?.message || err));
     }
-  });
-
-  bindColorPreview('colorHeader', 'previewColorHeader');
-  bindColorPreview('colorDateCol', 'previewColorDateCol');
-  bindColorPreview('colorOffRow', 'previewColorOffRow');
-
-  tryAutoLogin();
-});
-
-  // INIT THEME
-document.addEventListener('DOMContentLoaded', () => {
-  loadTheme();
-
-  const btn = document.getElementById('btnToggleTheme');
-  if (btn){
-    btn.addEventListener('click', toggleTheme);
   }
-});
+
+  function applyTheme(theme){
+    if (theme === 'dark'){
+      document.body.classList.add('dark');
+      const btn = $('btnToggleTheme');
+      if (btn) btn.textContent = '☀️ Mode Terang';
+    } else {
+      document.body.classList.remove('dark');
+      const btn = $('btnToggleTheme');
+      if (btn) btn.textContent = '🌙 Mode Gelap';
+    }
+  }
+
+  function toggleTheme(){
+    const isDark = document.body.classList.contains('dark');
+    const next = isDark ? 'light' : 'dark';
+    localStorage.setItem(THEME_KEY, next);
+    applyTheme(next);
+  }
+
+  function loadTheme(){
+    const saved = localStorage.getItem(THEME_KEY) || 'light';
+    applyTheme(saved);
+  }
+
+  window.addEventListener('load', ()=>{
+    bindLoginEnterBehavior();
+    loadTheme();
+
+    $('btnToggleTheme')?.addEventListener('click', toggleTheme);
+
+    $('loginView')?.classList.add('hidden');
+    $('appView')?.classList.add('hidden');
+
+    $('btnLogin')?.addEventListener('click', e=>{ e.preventDefault(); doLogin(); });
+    $('btnForgot')?.addEventListener('click', e=>{ e.preventDefault(); openForgot(); });
+    $('btnRegister')?.addEventListener('click', e=>{ e.preventDefault(); openRegister(); });
+
+    document.querySelectorAll('.tab[data-tab]').forEach(el=>{
+      el.addEventListener('click', ()=> showTab(el.getAttribute('data-tab')));
+    });
+
+    $('btnPreviewMobile')?.addEventListener('click', generatePreview);
+    $('btnDownloadMobile')?.addEventListener('click', downloadPdf);
+    $('btnPrint')?.addEventListener('click', printPreview);
+
+    $('btnLogout')?.addEventListener('click', doLogout);
+    $('btnPreview')?.addEventListener('click', generatePreview);
+    $('btnDownload')?.addEventListener('click', downloadPdf);
+    $('btnDownloadExcel')?.addEventListener('click', downloadExcel);
+
+    $('btnRefreshDrafts')?.addEventListener('click', refreshDrafts);
+    $('btnSaveDraft')?.addEventListener('click', saveDraft);
+    $('btnLoadDraft')?.addEventListener('click', loadDraft);
+    $('btnDeleteDraft')?.addEventListener('click', deleteDraft);
+
+    $('btnRefreshFiles')?.addEventListener('click', refreshFiles);
+    $('btnOpenFolder')?.addEventListener('click', openFolder);
+
+    $('btnUploadLhk')?.addEventListener('click', uploadLhk);
+    $('btnChangePass')?.addEventListener('click', changePassword);
+    $('btnChangeEmail')?.addEventListener('click', changeEmail);
+
+    $('btnAdminRefreshNotifications')?.addEventListener('click', ()=>{
+      adminRefreshNotifications();
+      adminRefreshNotificationsQuick();
+    });
+    $('btnAdminClearNotifications')?.addEventListener('click', adminClearNotifications);
+    $('btnAdminRefreshOnlineUsers')?.addEventListener('click', adminRefreshOnlineUsers);
+    $('btnAdminLoadUsers')?.addEventListener('click', adminLoadUsers);
+    $('btnAdminCreateUser')?.addEventListener('click', adminCreateUser);
+
+    $('btnAdminSaveUploadRoot')?.addEventListener('click', adminSaveUploadRoot);
+    $('btnAdminCreateUploadFolder')?.addEventListener('click', adminCreateUploadFolder);
+    $('btnAdminRefreshUploadFolders')?.addEventListener('click', adminRefreshUploadFolders);
+
+    $('btnAdminRefreshLogs')?.addEventListener('click', adminRefreshLogs);
+    $('btnAdminClearLogs')?.addEventListener('click', adminClearLogs);
+
+    document.addEventListener('keydown', (e)=>{
+      if (e.key === 'Escape'){
+        const m = $('modal');
+        if (m && !m.classList.contains('hidden')) modalHide();
+      }
+    });
+
+    bindColorPreview('colorHeader', 'previewColorHeader');
+    bindColorPreview('colorDateCol', 'previewColorDateCol');
+    bindColorPreview('colorOffRow', 'previewColorOffRow');
+
+    tryAutoLogin();
+  });
 </script>
 </body>
 </html>
