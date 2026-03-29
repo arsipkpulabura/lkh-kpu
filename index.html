@@ -1292,64 +1292,7 @@ body.dark .heroStripe{
         </div>
 
         <div class="sectionGroup">
-          <div class="sectionCard open" id="secLhkForm">
-            <button type="button" class="sectionHead" onclick="toggleSection('secLhkForm')"><span class="left"><span class="title">Data Formulir</span><span class="sub">Lengkapi data pegawai, periode laporan, pengaturan atasan, dan tanda tangan dokumen.</span></span><span class="chev">⌄</span></button>
-            <div class="sectionBody">
-              <div class="row">
-                <div><label for="nama">Nama</label><input id="nama" disabled></div>
-                <div><label for="nip">NIP</label><input id="nip" disabled></div>
-              </div>
-              <div class="row">
-<div class="row">
-  <div>
-    <label for="subBagian">Sub Bagian</label>
-    <select id="subBagian">
-      <option value="" selected>-- Pilih Sub Bagian --</option>
-    </select>
-  </div>
-
-  <div>
-    <label for="jabatan">Jabatan</label>
-    <input id="jabatan" placeholder="Masukkan jabatan">
-  </div>
-</div>
-              <div class="row">
-                <div><label for="month">Bulan</label>
-                  <select id="month">
-                    <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option><option value="4">April</option>
-                    <option value="5">Mei</option><option value="6">Juni</option><option value="7">Juli</option><option value="8">Agustus</option>
-                    <option value="9">September</option><option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
-                  </select>
-                </div>
-                <div><label for="year">Tahun</label><input id="year" type="number" placeholder="Contoh: 2026"></div>
-              </div>
-              <label for="kota">Kota</label><input id="kota" placeholder="Masukkan nama kota">
-              <label for="holidays">Hari Libur Tambahan (Opsional)</label><input id="holidays" placeholder="Contoh: 1 10 17 atau 1,10,17 atau 2026-03-29"><div class="hint">Isi tanggal tambahan bila ada hari libur khusus di luar kalender otomatis.</div>
-              <div class="row">
-                <div><label for="fontOut">Ukuran Font di Luar Tabel</label><select id="fontOut"><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12" selected>12</option><option value="13">13</option><option value="14">14</option></select></div>
-                <div><label for="fontIn">Ukuran Font di Dalam Tabel</label><select id="fontIn"><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12" selected>12</option><option value="13">13</option><option value="14">14</option></select></div>
-              </div>
-              <label for="jabatanPembuat">Jabatan Pembuat</label><input id="jabatanPembuat" disabled><div class="hint">Terisi otomatis mengikuti jabatan yang Anda input.</div>
-              
-<div>
-  <label for="jabatanAtasan">Jabatan Atasan</label>
-  <select id="jabatanAtasan">
-    <option value="" selected>-- Pilih Jabatan Atasan --</option>
-  </select>
-</div>
-              <div class="row">
-                <div><label for="namaAtasan">Nama Atasan</label><select id="namaAtasan"></select></div>
-                <div><label for="nipAtasan">NIP Atasan</label><input id="nipAtasan" disabled><div class="hint">NIP atasan akan terisi otomatis berdasarkan data yang tersimpan.</div></div>
-              </div>
-              <label for="signatureMode">Mode Tanda Tangan</label>
-              <select id="signatureMode"><option value="text" selected>Teks biasa</option><option value="barcode">Barcode / QR otomatis</option><option value="image">Upload gambar tanda tangan</option></select>
-              <div class="hint">Pilih mode barcode untuk QR otomatis, atau upload gambar jika ingin memakai tanda tangan hasil scan.</div>
-              <div id="sigUploadRow" class="row hidden" style="margin-top:10px;">
-                <div><label for="sigPembuatFile">Upload Tanda Tangan Pembuat (PNG/JPG)</label><input id="sigPembuatFile" type="file" accept="image/*"></div>
-                <div><label for="sigAtasanFile">Upload Tanda Tangan Atasan (PNG/JPG)</label><input id="sigAtasanFile" type="file" accept="image/*"></div>
-              </div>
-            </div>
-          </div>
+<div class="sectionCard open" id="secLhkForm">
 
           <div class="sectionCard" id="secLhkColors">
             <button type="button" class="sectionHead" onclick="toggleSection('secLhkColors')"><span class="left"><span class="title">Preferensi Tampilan Dokumen</span><span class="sub">Atur warna dokumen secara visual agar preview dan hasil PDF lebih enak dilihat.</span></span><span class="chev">⌄</span></button>
@@ -1645,51 +1588,74 @@ body.dark .heroStripe{
     apiCall('logout', {}, t).catch(()=>{});
   }
 
-  function fillSelect(id, arr){
-    const sel = $(id);
-    if (!sel) return;
-    sel.innerHTML = '';
-    (arr || []).forEach(v=>{
-      const o = document.createElement('option');
-      o.value = v;
-      o.textContent = v;
-      sel.appendChild(o);
-    });
+function fillSelect(id, arr){
+  const sel = $(id);
+  if (!sel) return;
+
+  const currentValue = sel.value || '';
+  const firstOption = sel.querySelector('option[value=""]');
+  const placeholderText = firstOption
+    ? firstOption.textContent
+    : '-- Pilih Data --';
+
+  sel.innerHTML = '';
+
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = placeholderText;
+  sel.appendChild(placeholder);
+
+  (arr || []).forEach(v => {
+    const value = String(v ?? '').trim();
+    if (!value) return;
+
+    const o = document.createElement('option');
+    o.value = value;
+    o.textContent = value;
+    sel.appendChild(o);
+  });
+
+  sel.value = currentValue;
+  if (![...sel.options].some(opt => opt.value === sel.value)) {
+    sel.value = '';
+  }
+}
+
+function fillAtasanByJabatan(selectedNama = ''){
+  const jabatanEl = $('jabatanAtasan');
+  const namaEl = $('namaAtasan');
+  const nipEl = $('nipAtasan');
+  if (!jabatanEl || !namaEl) return;
+
+  const jabatan = String(jabatanEl.value || '').trim();
+
+  const filtered = atasanOptions.filter(item =>
+    String(item?.jabatan || '').trim() === jabatan
+  );
+
+  namaEl.innerHTML = '';
+
+  const first = document.createElement('option');
+  first.value = '';
+  first.textContent = '-- Pilih Nama Atasan --';
+  namaEl.appendChild(first);
+
+  filtered.forEach(item => {
+    const o = document.createElement('option');
+    o.value = String(item?.nama || '');
+    o.textContent = String(item?.nama || '');
+    namaEl.appendChild(o);
+  });
+
+  if (selectedNama) {
+    const found = filtered.find(item => String(item?.nama || '') === String(selectedNama));
+    namaEl.value = found ? found.nama : '';
+  } else {
+    namaEl.value = '';
   }
 
-  function fillAtasanByJabatan(selectedNama = ''){
-    const jabatanEl = $('jabatanAtasan');
-    const namaEl = $('namaAtasan');
-    const nipEl = $('nipAtasan');
-    if (!jabatanEl || !namaEl) return;
-
-    const jabatan = String(jabatanEl.value || '').trim();
-
-    const filtered = atasanOptions.filter(item =>
-      String(item?.jabatan || '').trim() === jabatan
-    );
-
-    namaEl.innerHTML = '';
-
-    const first = document.createElement('option');
-    first.value = '';
-    first.textContent = filtered.length ? 'Pilih nama atasan' : 'Tidak ada data';
-    namaEl.appendChild(first);
-
-    filtered.forEach(item => {
-      const o = document.createElement('option');
-      o.value = String(item?.nama || '');
-      o.textContent = String(item?.nama || '');
-      namaEl.appendChild(o);
-    });
-
-    if (selectedNama) {
-      const found = filtered.find(item => String(item?.nama || '') === String(selectedNama));
-      if (found) namaEl.value = found.nama;
-    }
-
-    if (nipEl) nipEl.value = '';
-  }
+  if (nipEl) nipEl.value = '';
+}
 
   function syncAtasanNip(){
     const jabatanEl = $('jabatanAtasan');
