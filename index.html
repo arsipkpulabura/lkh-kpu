@@ -955,29 +955,62 @@
     }
   }
 
-  body.dark{
-  --bg:#0f172a;
+  body{
+  transition:background .28s ease, color .28s ease;
+}
+
+.card,
+.sectionCard,
+.toolbarCard,
+.miniCard,
+.quickMiniCard,
+.colorItem,
+.previewBox,
+.modal-card,
+.bootCard,
+input,
+select,
+textarea,
+table,
+th,
+td,
+button{
+  transition:
+    background .28s ease,
+    color .28s ease,
+    border-color .28s ease,
+    box-shadow .28s ease;
+}
+
+body.dark{
+  --bg:#0b1220;
   --bg-soft:#111827;
-  --surface:#1f2937;
-  --surface-2:#111827;
+  --surface:#111827;
+  --surface-2:#0f172a;
   --surface-3:#0b1220;
 
-  --text:#f9fafb;
-  --text-soft:#e5e7eb;
-  --muted:#9ca3af;
-  --muted-2:#6b7280;
+  --text:#f8fafc;
+  --text-soft:#e2e8f0;
+  --muted:#94a3b8;
+  --muted-2:#64748b;
 
   --line:rgba(255,255,255,.08);
   --line-strong:rgba(255,255,255,.14);
 
   --brand:#ef4444;
   --brand-strong:#dc2626;
-}
-  body.dark{
+  --brand-soft:rgba(239,68,68,.14);
+  --brand-soft-2:rgba(239,68,68,.20);
+
+  --shadow-xs:0 4px 12px rgba(0,0,0,.25);
+  --shadow-sm:0 10px 24px rgba(0,0,0,.28);
+  --shadow-md:0 18px 40px rgba(0,0,0,.34);
+  --shadow-lg:0 28px 70px rgba(0,0,0,.42);
+
   background:
-    radial-gradient(1100px 620px at -10% -10%, rgba(239,68,68,.16), transparent 55%),
-    radial-gradient(900px 540px at 110% 0%, rgba(244,197,66,.10), transparent 52%),
-    linear-gradient(180deg, #0b1220 0%, #111827 45%, #0f172a 100%);
+    radial-gradient(1100px 620px at -10% -10%, rgba(239,68,68,.12), transparent 55%),
+    radial-gradient(900px 540px at 110% 0%, rgba(244,197,66,.06), transparent 52%),
+    linear-gradient(180deg, #020617 0%, #0f172a 42%, #111827 100%);
 }
 
 body.dark .card,
@@ -989,52 +1022,18 @@ body.dark .colorItem,
 body.dark .previewBox,
 body.dark .modal-card,
 body.dark .bootCard{
-  background:linear-gradient(180deg, rgba(17,24,39,.96), rgba(15,23,42,.92));
+  background:linear-gradient(180deg, rgba(15,23,42,.96), rgba(17,24,39,.94));
   border:1px solid rgba(255,255,255,.08);
   box-shadow:0 18px 40px rgba(0,0,0,.35);
   color:var(--text);
 }
 
 body.dark .card::before{
-  background:linear-gradient(90deg, var(--brand), #fb7185 45%, var(--gold) 100%);
-}
-
-body.dark input,
-body.dark select,
-body.dark textarea{
-  background:#111827 !important;
-  color:#f9fafb !important;
-  border:1px solid rgba(255,255,255,.12) !important;
-  box-shadow:none;
-}
-
-body.dark input::placeholder,
-body.dark textarea::placeholder{
-  color:#94a3b8;
-}
-
-body.dark input:disabled{
-  background:#0f172a !important;
-  color:#cbd5e1 !important;
-}
-
-body.dark input:hover,
-body.dark select:hover,
-body.dark textarea:hover{
-  background:#0f172a !important;
-  border-color:rgba(239,68,68,.35) !important;
-}
-
-body.dark input:focus,
-body.dark select:focus,
-body.dark textarea:focus{
-  background:#111827 !important;
-  border-color:rgba(239,68,68,.6) !important;
-  box-shadow:0 0 0 4px rgba(239,68,68,.12) !important;
+  background:linear-gradient(90deg, var(--brand), #fb7185 45%, #f4c542 100%);
 }
 
 body.dark .tabs{
-  background:rgba(15,23,42,.72);
+  background:rgba(15,23,42,.78);
   border:1px solid rgba(255,255,255,.08);
   box-shadow:none;
 }
@@ -1045,55 +1044,49 @@ body.dark .tab{
 
 body.dark .tab:hover{
   color:#fff;
-  background:rgba(239,68,68,.10);
+  background:rgba(239,68,68,.12);
   border-color:rgba(239,68,68,.18);
 }
 
 body.dark .tab.active{
-  color:#fff;
   background:linear-gradient(180deg, #ef4444, #dc2626);
-  box-shadow:0 10px 22px rgba(239,68,68,.25);
-}
-
-body.dark button.secondary{
-  background:linear-gradient(180deg, #1f2937, #111827);
-  color:#f9fafb;
-  border-color:rgba(255,255,255,.10);
-}
-
-body.dark button.secondary:hover{
-  background:linear-gradient(180deg, #273449, #172033);
-}
-
-body.dark button.danger{
-  background:linear-gradient(180deg, rgba(127,29,29,.35), rgba(69,10,10,.45));
-  color:#fecaca;
-  border-color:rgba(248,113,113,.20);
-}
-
-body.dark .sectionHead:hover{
-  background:rgba(239,68,68,.08);
-}
-
-body.dark .sectionHead .chev{
-  background:rgba(239,68,68,.12);
-  color:#fca5a5;
-}
-
-body.dark .sectionCard.open .sectionHead .chev{
-  background:rgba(239,68,68,.20);
   color:#fff;
+  border-color:rgba(239,68,68,.30);
+  box-shadow:0 10px 22px rgba(239,68,68,.20);
 }
 
-body.dark .pageSub,
-body.dark .hint,
-body.dark .quickMiniSub,
-body.dark .colorSub,
-body.dark .miniMuted,
-body.dark .sectionHead .sub,
-body.dark .authSub,
-body.dark .brandSub{
+body.dark input,
+body.dark select,
+body.dark textarea{
+  background:#0f172a !important;
+  color:#f8fafc !important;
+  border:1px solid rgba(255,255,255,.12) !important;
+  box-shadow:none !important;
+}
+
+body.dark input::placeholder,
+body.dark textarea::placeholder{
   color:#94a3b8;
+}
+
+body.dark input:hover,
+body.dark select:hover,
+body.dark textarea:hover{
+  background:#111827 !important;
+  border-color:rgba(239,68,68,.30) !important;
+}
+
+body.dark input:focus,
+body.dark select:focus,
+body.dark textarea:focus{
+  background:#111827 !important;
+  border-color:rgba(239,68,68,.58) !important;
+  box-shadow:0 0 0 4px rgba(239,68,68,.12) !important;
+}
+
+body.dark input:disabled{
+  background:#0b1220 !important;
+  color:#cbd5e1 !important;
 }
 
 body.dark label,
@@ -1107,33 +1100,77 @@ body.dark .authTitle,
 body.dark .quickMiniTitle,
 body.dark .colorLabel,
 body.dark .modal-title{
-  color:#f9fafb;
+  color:#f8fafc;
+}
+
+body.dark .pageSub,
+body.dark .hint,
+body.dark .miniMuted,
+body.dark .quickMiniSub,
+body.dark .colorSub,
+body.dark .sectionHead .sub,
+body.dark .brandSub,
+body.dark .authSub{
+  color:#94a3b8;
+}
+
+body.dark .sectionHead:hover{
+  background:rgba(239,68,68,.08);
+}
+
+body.dark .sectionHead .chev{
+  background:rgba(239,68,68,.12);
+  color:#fecaca;
+}
+
+body.dark .sectionCard.open .sectionHead .chev{
+  background:rgba(239,68,68,.20);
+  color:#fff;
+}
+
+body.dark button.secondary{
+  background:linear-gradient(180deg, #1f2937, #111827);
+  color:#f8fafc;
+  border-color:rgba(255,255,255,.10);
+  box-shadow:none;
+}
+
+body.dark button.secondary:hover{
+  background:linear-gradient(180deg, #273449, #172033);
+}
+
+body.dark button.danger{
+  background:linear-gradient(180deg, rgba(127,29,29,.34), rgba(69,10,10,.44));
+  color:#fecaca;
+  border-color:rgba(248,113,113,.20);
 }
 
 body.dark table{
-  background:#111827;
+  background:#0f172a;
   border:1px solid rgba(255,255,255,.08);
+  box-shadow:none;
 }
 
 body.dark th{
   background:linear-gradient(180deg, #1f2937, #172033);
-  color:#f9fafb;
+  color:#f8fafc;
   border-right:1px solid rgba(255,255,255,.08);
+  border-bottom:1px solid rgba(255,255,255,.08);
 }
 
 body.dark td{
-  background:#0f172a;
-  color:#e5e7eb;
-  border-right:1px solid rgba(255,255,255,.06);
+  background:#0b1220;
+  color:#e2e8f0;
+  border-right:1px solid rgba(255,255,255,.05);
   border-bottom:1px solid rgba(255,255,255,.06);
 }
 
 body.dark tr:hover td{
-  background:#162033;
+  background:#132033;
 }
 
 body.dark iframe{
-  background:#0f172a;
+  background:#0b1220;
 }
 
 body.dark .toast{
@@ -1143,7 +1180,7 @@ body.dark .toast{
 }
 
 body.dark .modal{
-  background:rgba(2,6,23,.68);
+  background:rgba(2,6,23,.72);
 }
 
 body.dark .brandLogo,
@@ -1154,13 +1191,6 @@ body.dark .bootLogoWrap{
 
 body.dark .heroStripe{
   border:1px solid rgba(255,255,255,.08);
-}
-
-body.dark .panelBadge,
-body.dark .pill{
-  background:rgba(244,197,66,.12);
-  color:#fde68a;
-  border-color:rgba(244,197,66,.28);
 }
 </style>
 </head>
@@ -1202,28 +1232,26 @@ body.dark .pill{
 
     <div id="appView" class="hidden">
       <div class="card">
-        <div class="panelIntro">
-          <div class="meta">
-            <div class="brandEyebrow">KOMISI PEMILIHAN UMUM</div>
-            <div class="appName">KPU Kabupaten Labuhanbatu Utara</div>
-            <div class="pageSub">Laporan Kinerja Harian</div>
-            <div class="pageSub" id="whoami"></div>
-          </div>
-<div>
-  <button type="button" class="secondary" id="btnToggleTheme">
-    🌙 Mode Gelap
-  </button>
+<div class="panelIntro">
+  <div class="meta">
+    <div class="brandEyebrow">KOMISI PEMILIHAN UMUM</div>
+    <div class="appName">KPU Kabupaten Labuhanbatu Utara</div>
+    <div class="pageSub">Laporan Kinerja Harian</div>
+    <div class="pageSub" id="whoami"></div>
+  </div>
+
+  <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+    <button type="button" class="secondary" id="btnToggleTheme">🌙 Mode Gelap</button>
+    <button class="secondary" type="button" id="btnLogout">Logout</button>
+  </div>
 </div>
-<div>
-  <button class="secondary" type="button" id="btnLogout">Logout</button>
+
+<div class="tabs">
+  <div class="tab active" id="tabLhk" data-tab="lhk">Penyusunan LKH</div>
+  <div class="tab" id="tabFiles" data-tab="files">Dokumen Saya</div>
+  <div class="tab" id="tabPass" data-tab="pass">Akun</div>
+  <div class="tab hidden" id="tabAdmin" data-tab="admin">Administrasi</div>
 </div>
- </div>
-        <div class="tabs">
-          <div class="tab active" id="tabLhk" data-tab="lhk">Penyusunan LKH</div>
-          <div class="tab" id="tabFiles" data-tab="files">Dokumen Saya</div>
-          <div class="tab" id="tabPass" data-tab="pass">Akun</div>
-          <div class="tab hidden" id="tabAdmin" data-tab="admin">Administrasi</div>
-        </div>
         <div class="topQuickRow hidden" id="adminQuickRow">
           <div class="quickMiniCard">
             <div class="quickMiniTitle">Inbox Admin Ringkas</div>
@@ -2085,55 +2113,84 @@ function loadTheme(){
   applyTheme(saved);
 }
 
-  window.addEventListener('load', ()=>{
-    bindLoginEnterBehavior();
-      loadTheme();
+window.addEventListener('load', ()=>{
+  bindLoginEnterBehavior();
+  loadTheme();
   $('btnToggleTheme')?.addEventListener('click', toggleTheme);
-    $('loginView')?.classList.add('hidden'); $('appView')?.classList.add('hidden');
 
-    $('btnLogin')?.addEventListener('click', e=>{ e.preventDefault(); doLogin(); });
-    $('btnForgot')?.addEventListener('click', e=>{ e.preventDefault(); openForgot(); });
-    $('btnRegister')?.addEventListener('click', e=>{ e.preventDefault(); openRegister(); });
-    document.querySelectorAll('.tab[data-tab]').forEach(el=> el.addEventListener('click', ()=> showTab(el.getAttribute('data-tab'))));
+  $('loginView')?.classList.add('hidden');
+  $('appView')?.classList.add('hidden');
 
-    $('btnPreviewMobile')?.addEventListener('click', generatePreview);
-    $('btnDownloadMobile')?.addEventListener('click', downloadPdf);
-    $('btnPrint')?.addEventListener('click', printPreview);
-
-    $('btnLogout')?.addEventListener('click', doLogout);
-    $('btnPreview')?.addEventListener('click', generatePreview);
-    $('btnDownload')?.addEventListener('click', downloadPdf);
-    $('btnDownloadExcel')?.addEventListener('click', downloadExcel);
-
-    $('btnRefreshDrafts')?.addEventListener('click', refreshDrafts);
-    $('btnSaveDraft')?.addEventListener('click', saveDraft);
-    $('btnLoadDraft')?.addEventListener('click', loadDraft);
-    $('btnDeleteDraft')?.addEventListener('click', deleteDraft);
-
-    $('btnRefreshFiles')?.addEventListener('click', refreshFiles);
-    $('btnOpenFolder')?.addEventListener('click', openFolder);
-
-    $('btnUploadLhk')?.addEventListener('click', uploadLhk);
-    $('btnChangePass')?.addEventListener('click', changePassword);
-    $('btnChangeEmail')?.addEventListener('click', changeEmail);
-
-    $('btnAdminRefreshNotifications')?.addEventListener('click', ()=>{ adminRefreshNotifications(); adminRefreshNotificationsQuick(); });
-    $('btnAdminClearNotifications')?.addEventListener('click', adminClearNotifications);
-    $('btnAdminRefreshOnlineUsers')?.addEventListener('click', adminRefreshOnlineUsers);
-    $('btnAdminLoadUsers')?.addEventListener('click', adminLoadUsers);
-    $('btnAdminCreateUser')?.addEventListener('click', adminCreateUser);
-
-    $('btnAdminSaveUploadRoot')?.addEventListener('click', adminSaveUploadRoot);
-    $('btnAdminCreateUploadFolder')?.addEventListener('click', adminCreateUploadFolder);
-    $('btnAdminRefreshUploadFolders')?.addEventListener('click', adminRefreshUploadFolders);
-
-    $('btnAdminRefreshLogs')?.addEventListener('click', adminRefreshLogs);
-    $('btnAdminClearLogs')?.addEventListener('click', adminClearLogs);
-
-    document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape'){ const m = $('modal'); if (m && !m.classList.contains('hidden')) modalHide(); } });
-    bindColorPreview('colorHeader', 'previewColorHeader'); bindColorPreview('colorDateCol', 'previewColorDateCol'); bindColorPreview('colorOffRow', 'previewColorOffRow');
-    tryAutoLogin();
+  $('btnLogin')?.addEventListener('click', (e)=>{
+    e.preventDefault();
+    doLogin();
   });
+
+  $('btnForgot')?.addEventListener('click', (e)=>{
+    e.preventDefault();
+    openForgot();
+  });
+
+  $('btnRegister')?.addEventListener('click', (e)=>{
+    e.preventDefault();
+    openRegister();
+  });
+
+  document.querySelectorAll('.tab[data-tab]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      showTab(el.getAttribute('data-tab'));
+    });
+  });
+
+  $('btnPreview')?.addEventListener('click', generatePreview);
+  $('btnPreviewMobile')?.addEventListener('click', generatePreview);
+  $('btnDownload')?.addEventListener('click', downloadPdf);
+  $('btnDownloadMobile')?.addEventListener('click', downloadPdf);
+  $('btnDownloadExcel')?.addEventListener('click', downloadExcel);
+  $('btnPrint')?.addEventListener('click', printPreview);
+  $('btnLogout')?.addEventListener('click', doLogout);
+
+  $('btnRefreshDrafts')?.addEventListener('click', refreshDrafts);
+  $('btnSaveDraft')?.addEventListener('click', saveDraft);
+  $('btnLoadDraft')?.addEventListener('click', loadDraft);
+  $('btnDeleteDraft')?.addEventListener('click', deleteDraft);
+
+  $('btnRefreshFiles')?.addEventListener('click', refreshFiles);
+  $('btnOpenFolder')?.addEventListener('click', openFolder);
+
+  $('btnUploadLhk')?.addEventListener('click', uploadLhk);
+  $('btnChangePass')?.addEventListener('click', changePassword);
+  $('btnChangeEmail')?.addEventListener('click', changeEmail);
+
+  $('btnAdminRefreshNotifications')?.addEventListener('click', ()=>{
+    adminRefreshNotifications();
+    adminRefreshNotificationsQuick();
+  });
+  $('btnAdminClearNotifications')?.addEventListener('click', adminClearNotifications);
+  $('btnAdminRefreshOnlineUsers')?.addEventListener('click', adminRefreshOnlineUsers);
+  $('btnAdminLoadUsers')?.addEventListener('click', adminLoadUsers);
+  $('btnAdminCreateUser')?.addEventListener('click', adminCreateUser);
+
+  $('btnAdminSaveUploadRoot')?.addEventListener('click', adminSaveUploadRoot);
+  $('btnAdminCreateUploadFolder')?.addEventListener('click', adminCreateUploadFolder);
+  $('btnAdminRefreshUploadFolders')?.addEventListener('click', adminRefreshUploadFolders);
+
+  $('btnAdminRefreshLogs')?.addEventListener('click', adminRefreshLogs);
+  $('btnAdminClearLogs')?.addEventListener('click', adminClearLogs);
+
+  document.addEventListener('keydown', (e)=>{
+    if (e.key === 'Escape'){
+      const m = $('modal');
+      if (m && !m.classList.contains('hidden')) modalHide();
+    }
+  });
+
+  bindColorPreview('colorHeader', 'previewColorHeader');
+  bindColorPreview('colorDateCol', 'previewColorDateCol');
+  bindColorPreview('colorOffRow', 'previewColorOffRow');
+
+  tryAutoLogin();
+});
 
   // INIT THEME
 document.addEventListener('DOMContentLoaded', () => {
