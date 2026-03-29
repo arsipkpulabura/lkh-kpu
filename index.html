@@ -954,6 +954,25 @@
       margin-top:8vh;
     }
   }
+
+  body.dark{
+  --bg:#0f172a;
+  --bg-soft:#111827;
+  --surface:#1f2937;
+  --surface-2:#111827;
+  --surface-3:#0b1220;
+
+  --text:#f9fafb;
+  --text-soft:#e5e7eb;
+  --muted:#9ca3af;
+  --muted-2:#6b7280;
+
+  --line:rgba(255,255,255,.08);
+  --line-strong:rgba(255,255,255,.14);
+
+  --brand:#ef4444;
+  --brand-strong:#dc2626;
+}
 </style>
 </head>
 <body class="booting">
@@ -1001,7 +1020,11 @@
             <div class="pageSub">Laporan Kinerja Harian</div>
             <div class="pageSub" id="whoami"></div>
           </div>
-          <div><span class="panelBadge">Ganti Tema</span></div><div><button class="secondary" type="button" id="btnLogout">Logout</button></div>
+          <div>
+  <button type="button" class="secondary" id="btnToggleTheme">
+    🌙 Mode Gelap
+  </button>
+</div><button class="secondary" type="button" id="btnLogout">Logout</button></div>
         </div>
         <div class="tabs">
           <div class="tab active" id="tabLhk" data-tab="lhk">Penyusunan LKH</div>
@@ -1843,6 +1866,33 @@
     }catch(err){ setStatus('Error: ' + (err?.message || err)); }
   }
 
+  // ===== THEME TOGGLE =====
+const THEME_KEY = 'lhk_theme';
+
+function applyTheme(theme){
+  if (theme === 'dark'){
+    document.body.classList.add('dark');
+    const btn = document.getElementById('btnToggleTheme');
+    if (btn) btn.textContent = '☀️ Mode Terang';
+  } else {
+    document.body.classList.remove('dark');
+    const btn = document.getElementById('btnToggleTheme');
+    if (btn) btn.textContent = '🌙 Mode Gelap';
+  }
+}
+
+function toggleTheme(){
+  const isDark = document.body.classList.contains('dark');
+  const next = isDark ? 'light' : 'dark';
+  localStorage.setItem(THEME_KEY, next);
+  applyTheme(next);
+}
+
+function loadTheme(){
+  const saved = localStorage.getItem(THEME_KEY) || 'light';
+  applyTheme(saved);
+}
+
   window.addEventListener('load', ()=>{
     bindLoginEnterBehavior();
     $('loginView')?.classList.add('hidden'); $('appView')?.classList.add('hidden');
@@ -1890,6 +1940,16 @@
     bindColorPreview('colorHeader', 'previewColorHeader'); bindColorPreview('colorDateCol', 'previewColorDateCol'); bindColorPreview('colorOffRow', 'previewColorOffRow');
     tryAutoLogin();
   });
+
+  // INIT THEME
+document.addEventListener('DOMContentLoaded', () => {
+  loadTheme();
+
+  const btn = document.getElementById('btnToggleTheme');
+  if (btn){
+    btn.addEventListener('click', toggleTheme);
+  }
+});
 </script>
 </body>
 </html>
