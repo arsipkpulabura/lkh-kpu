@@ -1300,7 +1300,9 @@ body.dark .heroStripe{
                 <div><label for="nip">NIP</label><input id="nip" disabled></div>
               </div>
               <div class="row">
-                <div><label for="subBagian">Sub Bagian</label><select id="subBagian"></select></div>
+                <div><label for="subBagian">Sub Bagian</label><select id="subBagian">
+  <option value="" selected>-- Pilih Sub Bagian --</option>
+</select>
                 <div><label for="jabatan">Jabatan</label><input id="jabatan" placeholder="Masukkan jabatan"></div>
               </div>
               <div class="row">
@@ -1320,8 +1322,9 @@ body.dark .heroStripe{
                 <div><label for="fontIn">Ukuran Font di Dalam Tabel</label><select id="fontIn"><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12" selected>12</option><option value="13">13</option><option value="14">14</option></select></div>
               </div>
               <label for="jabatanPembuat">Jabatan Pembuat</label><input id="jabatanPembuat" disabled><div class="hint">Terisi otomatis mengikuti jabatan yang Anda input.</div>
-              <select id="jabatanAtasan">
-  <option value="" disabled selected hidden>-- Pilih Jabatan Atasan --</option>
+              
+<select id="jabatanAtasan">
+  <option value="" selected>-- Pilih Jabatan Atasan --</option>
 </select>
               <div class="row">
                 <div><label for="namaAtasan">Nama Atasan</label><select id="namaAtasan"></select></div>
