@@ -1193,18 +1193,31 @@ body.dark .heroStripe{
   border:1px solid rgba(255,255,255,.08);
 }
 
-  .popupPanel{
+.popupPanel{
   position: fixed;
-  top: 90px;
-  right: 24px;
-  width: min(460px, calc(100vw - 24px));
-  max-height: calc(100vh - 120px);
+  top: 110px;
+  left: 50%;
+  right: auto;              /* penting: buang right lama */
+  transform: translateX(-50%);
+  width: min(900px, calc(100vw - 32px));
+  max-height: calc(100vh - 140px);
   overflow: auto;
   z-index: 9999;
   background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,248,248,.96));
   border: 1px solid rgba(24,33,47,.08);
   border-radius: 22px;
   box-shadow: var(--shadow-lg);
+}
+  .popupOverlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,.35);
+  backdrop-filter: blur(3px);
+  z-index: 9998;
+}
+
+.popupOverlay.hidden{
+  display: none !important;
 }
 
 .popupPanel.hidden{
@@ -3007,6 +3020,39 @@ function fillAtasanByJabatan(selectedNama = ''){
     }
   }
 
+  function closePopupPanels(){
+  document.getElementById('secLhkColors')?.classList.add('hidden');
+  document.getElementById('secLhkDraft')?.classList.add('hidden');
+  document.getElementById('popupOverlay')?.classList.add('hidden');
+}
+
+function toggleSection(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  const isPopup = el.classList.contains('popupPanel');
+
+  if (isPopup){
+    const overlay = document.getElementById('popupOverlay');
+
+    const willOpen = el.classList.contains('hidden');
+
+    closePopupPanels();
+
+    if (willOpen){
+      el.classList.remove('hidden');
+      overlay?.classList.remove('hidden');
+    }
+    return;
+  }
+
+  el.classList.toggle('open');
+}
+
+document.addEventListener('keydown', (e)=>{
+  if (e.key === 'Escape') closePopupPanels();
+});
+
   function toggleTheme(){
     const isDark = document.body.classList.contains('dark');
     const next = isDark ? 'light' : 'dark';
@@ -3087,5 +3133,6 @@ function fillAtasanByJabatan(selectedNama = ''){
     tryAutoLogin();
   });
 </script>
+  <div id="popupOverlay" class="popupOverlay hidden" onclick="closePopupPanels()"></div>
 </body>
 </html>
