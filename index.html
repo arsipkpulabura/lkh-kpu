@@ -1210,6 +1210,9 @@ body.dark .heroStripe{
 .popupPanel.hidden{
   display:none !important;
 }
+  .popupPanel .sectionBody{
+  display:block !important;
+}
 </style>
 </head>
 <body class="booting">
@@ -1463,7 +1466,7 @@ body.dark .heroStripe{
     </div>
   </div>
 </div>
-          <div class="sectionCard hidden" id="secLhkColors">
+          <div class="sectionCard popupPanel hidden" id="secLhkColors">
             <button type="button" class="sectionHead" onclick="toggleSection('secLhkColors')"><span class="left"><span class="title">Preferensi Tampilan Dokumen</span><span class="sub">Atur warna dokumen secara visual agar preview dan hasil PDF lebih enak dilihat.</span></span><span class="chev">⌄</span></button>
             <div class="sectionBody">
               <div class="pageSub" style="margin-top:12px;">Atur tampilan warna dokumen dengan cara yang lebih visual. Warna yang dipilih akan langsung dipakai saat preview dan export PDF.</div>
@@ -1486,7 +1489,7 @@ body.dark .heroStripe{
             </div>
           </div>
 
-          <div class="sectionCard hidden" id="secLhkDraft">
+          <div class="sectionCard popupPanel hidden" id="secLhkDraft">
             <button type="button" class="sectionHead" onclick="toggleSection('secLhkDraft')"><span class="left"><span class="title">Draft</span><span class="sub">Simpan draft, buka kembali data sebelumnya, lalu lanjutkan pekerjaan tanpa mengulang dari awal.</span></span><span class="chev">⌄</span></button>
             <div class="sectionBody">
               <div class="row">
